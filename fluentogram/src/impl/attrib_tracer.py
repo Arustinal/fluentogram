@@ -11,6 +11,7 @@ TAttribTracer = TypeVar("TAttribTracer", bound="AttribTracer")
 
 class AttribTracer(AbstractAttribTracer):
     """Attribute tracer class for obj.attrib1.attrib2 access"""
+
     def __init__(self) -> None:
         self.request_line = ""
 

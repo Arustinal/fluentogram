@@ -16,7 +16,7 @@ class AbstractTranslator(ABC):
         self.locale = locale
         self.separator = separator
         self.translator = translator
-    
+
     @abstractmethod
     def get(self, key: str, **kwargs) -> str:
         """

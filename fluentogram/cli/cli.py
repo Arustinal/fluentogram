@@ -15,5 +15,5 @@ def cli() -> None:
     args = parser.parse_args()
 
     code = ftl_to_stub(ftl_path=args.ftl_path)
-    with open(args.stub_path, "wt", encoding='utf-8') as f:
+    with open(args.stub_path, "wt", encoding="utf-8") as f:
         f.write(code)

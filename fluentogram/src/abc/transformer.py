@@ -19,5 +19,5 @@ class AbstractDataTransformer(ABC):
     @abstractmethod
     def __new__(cls, data: Any, **kwargs) -> Any:
         """Using incoming data, create an object representation of these data for your translator via all needed
-        parameters using kwargs """
+        parameters using kwargs"""
         raise NotImplementedError

@@ -9,6 +9,7 @@ from fluentogram.src.abc.translator import TAbstractTranslator
 
 class AbstractTranslatorsHub(ABC):
     """This class should contain a couple of translator objects, usually one object per one locale."""
+
     @abstractmethod
     def __init__(self):
         raise NotImplementedError

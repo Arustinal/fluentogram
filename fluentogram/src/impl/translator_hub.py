@@ -15,10 +15,12 @@ class TranslatorHub(AbstractTranslatorsHub):
     This class implements a storage for all single-locale translators.
     """
 
-    def __init__(self,
-                 locales_map: Dict[str, Union[str, Iterable[str]]],
-                 translators: List[TAbstractTranslator],
-                 root_locale: str = "en") -> None:
+    def __init__(
+        self,
+        locales_map: Dict[str, Union[str, Iterable[str]]],
+        translators: List[TAbstractTranslator],
+        root_locale: str = "en",
+    ) -> None:
         self.locales_map = locales_map
         self.translators = translators
         self.root_locale = root_locale
@@ -36,5 +38,7 @@ class TranslatorHub(AbstractTranslatorsHub):
         This trick makes "obj.attribute1.attribute2" access to be able.
         You are able to do what you want, refer to the abstract class.
         """
-        translators = [self.storage.get(_locale) for _locale in self.locales_map.get(locale)]
+        translators = [
+            self.storage.get(_locale) for _locale in self.locales_map.get(locale)
+        ]
         return TranslatorRunner(translators=translators)
