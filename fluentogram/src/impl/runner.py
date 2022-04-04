@@ -4,7 +4,7 @@ A translator runner by itself
 """
 from typing import TypeVar, List
 
-from fluentogram import AttribTracer, FluentTranslator
+from fluentogram.src.impl import AttribTracer, FluentTranslator
 
 TTranslatorRunner = TypeVar("TTranslatorRunner", bound="TranslatorRunner")
 

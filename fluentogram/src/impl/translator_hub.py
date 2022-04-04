@@ -4,15 +4,17 @@ A Translator Hub, using as factory for Translator objects
 """
 from typing import Iterable, Dict, Union, List
 
-from fluentogram import NotImplementedRootLocaleTranslator
-from fluentogram.structure.abstract import AbstractTranslatorsHub, TAbstractTranslator
-from fluentogram.structure.fluent import TranslatorRunner
+from fluentogram.src.impl import TranslatorRunner
+from fluentogram.exceptions import NotImplementedRootLocaleTranslator
+from fluentogram.src.abc import AbstractTranslatorsHub
+from fluentogram.src.abc.translator import TAbstractTranslator
 
 
 class TranslatorHub(AbstractTranslatorsHub):
     """
     This class implements a storage for all single-locale translators.
     """
+
     def __init__(self,
                  locales_map: Dict[str, Union[str, Iterable[str]]],
                  translators: List[TAbstractTranslator],
