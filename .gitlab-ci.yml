@@ -18,11 +18,6 @@ stages:          # List of stages for jobs, and their order of execution
   - test
   - deploy
 
-build-job:       # This job runs in the build stage, which runs first.
-  stage: build
-  script:
-    - echo "Compiling the code..."
-    - echo "Compile complete."
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -35,5 +30,9 @@ unit-test-job:   # This job runs in the test stage.
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   script:
-    - echo "Deploying application..."
+    - python3 -m build 
+    - twine upload --repository test.pypi.org --username __token__ --password $PYPI_TEST_TOKEN dist/*
+    - sleep 60
+    - pip3 install --index-url https://test.pypi.org/simple/ fluentogram
     - echo "Application successfully deployed."
+    - twine upload --username __token__ --password $PYPI_PROD_TOKEN dist/*
