@@ -28,7 +28,8 @@ unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - echo "Running unit tests"
-    - poetry env user python3.10
+    - poetry env use python3.10
+    - poetry install
     - poetry run python3 -m unittest $CI_PROJECT_NAME.tests.test_usage
 
 deploy-job:      # This job runs in the deploy stage.
