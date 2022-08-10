@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "fluentogram"
-version = "1.0.28"
+version = "1.1"
 description = "A proper way to use an i18n mechanism with Aiogram3."
 authors = ["Aleks"]
 license = "MIT"
 
 [tool.poetry.scripts]
-i18n='fluentogram.cli:cli'
+i18n = 'fluentogram.cli:cli'
 
 [tool.poetry.dependencies]
 python = "^3.9"
