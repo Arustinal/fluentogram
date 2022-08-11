@@ -26,10 +26,10 @@ class Method(RenderAble):
     )
 
     def __init__(
-        self, method_name: str, translation: str = "fff", args: Optional[list] = None
+            self, method_name: str, translation: str, args: Optional[list] = None
     ) -> None:
         if args:
-            formatted_args = ", ".join(args)
+            formatted_args = "*, " + ", ".join(args)
         else:
             formatted_args = ""
         super().__init__(translation=translation, args=formatted_args)
