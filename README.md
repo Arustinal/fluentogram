@@ -1,9 +1,10 @@
 # fluentogram
 
-A proper way to use an i18n mechanism with Aiogram3.
-Using Project Fluent by Mozilla
+A proper way to use an i18n mechanism with Aiogram3. Using Project Fluent by Mozilla
+https://projectfluent.org/fluent/guide/
 
 Short example:
+
 ```
 # Somewhere in middleware.Grab language_code from telegram user object, or database, etc.
 translator_runner: TranslatorRunner = t_hub.get_translator_by_locale("en")
@@ -24,4 +25,5 @@ async def message_handler(message: Message, ..., i18n: TranslatorRunner):
     Your money, $500.00, has been sent successfully at Dec 4, 2022.
     """
 ```
+
 Check *Examples* folder.
