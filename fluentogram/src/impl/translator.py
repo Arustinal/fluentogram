@@ -23,3 +23,6 @@ class FluentTranslator(AbstractTranslator):
         if errors:
             raise errors.pop()
         return text
+
+    def __repr__(self):
+        return f"<fluentogram.FluentTranslator instance, \"{self.locale:}\">"

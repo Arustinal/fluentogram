@@ -3,9 +3,7 @@
 Translator as itself
 """
 from abc import ABC, abstractmethod
-from typing import TypeVar, Any
-
-TAbstractTranslator = TypeVar("TAbstractTranslator", bound="AbstractTranslator")
+from typing import Any
 
 
 class AbstractTranslator(ABC):

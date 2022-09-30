@@ -4,9 +4,6 @@ Some miscellaneous
 """
 
 from abc import ABC, abstractmethod
-from typing import TypeVar
-
-TAbstractAttribTracer = TypeVar("TAbstractAttribTracer", bound="AbstractAttribTracer")
 
 
 class AbstractAttribTracer(ABC):
@@ -28,7 +25,7 @@ class AbstractAttribTracer(ABC):
         return request_line
 
     @abstractmethod
-    def __getattr__(self, item) -> TAbstractAttribTracer:
+    def __getattr__(self, item) -> 'AbstractAttribTracer':
         """
         This method exists to map the "obj.attrib1.attrib2" access to "attrib1-attrib2" key.
         """

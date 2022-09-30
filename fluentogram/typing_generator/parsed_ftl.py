@@ -39,7 +39,6 @@ class ParsedRawFTL:
                 translation += content
             else:
                 chunk_json = chunk.expression.to_json()
-                print(chunk_json)
                 if chunk_json["type"] == "VariableReference":
                     translation_vars.append(chunk_json["id"]["name"])
                     translation += f"{{ ${chunk.expression.id.name} }}"

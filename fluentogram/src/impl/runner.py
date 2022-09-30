@@ -2,23 +2,24 @@
 """
 A translator runner by itself
 """
-from typing import TypeVar, List
+from typing import Iterable
 
-from fluentogram.src.impl import AttribTracer, FluentTranslator
+from fluentogram.src.abc import AbstractTranslator
+from fluentogram.src.abc.runner import AbstractTranslatorRunner
+from fluentogram.src.impl import AttribTracer
 
-TTranslatorRunner = TypeVar("TTranslatorRunner", bound="TranslatorRunner")
 
-
-class TranslatorRunner(AttribTracer):
+class TranslatorRunner(AbstractTranslatorRunner, AttribTracer):
     """This is one-shot per Telegram event translator with attrib tracer access way."""
 
-    def __init__(self, translators: List[FluentTranslator]) -> None:
+    def __init__(self, translators: Iterable[AbstractTranslator], separator: str = "-") -> None:
         super().__init__()
         self.translators = translators
+        self.separator = separator
         self.request_line = ""
 
     def get(self, key: str, **kwargs) -> str:
-        """Faster, direct way to use translator, without sugar-like typing supported attribute access way"""
+        """Fastest, direct way to use translator, without sugar-like typing supported attribute access way"""
         return self._get_translation(key, **kwargs)
 
     def _get_translation(self, key, **kwargs):
@@ -33,6 +34,6 @@ class TranslatorRunner(AttribTracer):
         self.request_line = ""
         return text
 
-    def __getattr__(self, item: str) -> TTranslatorRunner:
-        self.request_line += f"{item}{self.translators[0].separator}"
+    def __getattr__(self, item: str) -> 'TranslatorRunner':
+        self.request_line += f"{item}{self.separator}"
         return self

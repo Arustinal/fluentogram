@@ -4,7 +4,7 @@ An abstract base for the Translator Hub object
 """
 from abc import ABC, abstractmethod
 
-from fluentogram.src.abc.translator import TAbstractTranslator
+from fluentogram.src.abc.runner import AbstractTranslatorRunner
 
 
 class AbstractTranslatorsHub(ABC):
@@ -15,7 +15,7 @@ class AbstractTranslatorsHub(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_translator_by_locale(self, locale: str) -> TAbstractTranslator:
+    def get_translator_by_locale(self, locale: str) -> AbstractTranslatorRunner:
         """
         Returns a Translator object by selected locale
         """
