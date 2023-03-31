@@ -26,4 +26,4 @@ async def message_handler(message: Message, ..., i18n: TranslatorRunner):
     """
 ```
 
-Check *Examples* folder.
+Check [*Examples*](example) folder.
