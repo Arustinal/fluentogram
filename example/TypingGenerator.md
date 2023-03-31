@@ -6,7 +6,7 @@ By default, `stub.py` will contain `TranslatorRunner` class with type hints for 
 
 Usage in files:
 
-```
+```py
 from typing import TYPE_CHECKING
 
 from aiogram import Router
