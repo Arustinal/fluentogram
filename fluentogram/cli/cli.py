@@ -15,7 +15,7 @@ class FtlFileEventHandler(FileSystemEventHandler):
         self.stub_path = stub_path
 
     def on_modified(self, event: FileModifiedEvent):
-        print('event type: %s, path: %s' % (event.event_type, event.src_path))
+        print(f'event type: {event.event_type}, path: {event.src_path}')
         if not event.is_directory:
             messages = parse_ftl_dir(self.track_path)
             tree = Tree(messages)
@@ -26,14 +26,13 @@ class FtlFileEventHandler(FileSystemEventHandler):
 def parse_ftl(ftl_path: str | Path) -> dict:
     with open(ftl_path, "r", encoding="utf-8") as input_f:
         raw = ParsedRawFTL(input_f.read())
-    messages = raw.get_messages()
-    return messages
+    return raw.get_messages()
 
 
 def parse_ftl_dir(dir_path: str) -> dict:
     messages = {}
     for file in Path(dir_path).glob("*.ftl"):
-        messages.update(parse_ftl(file))
+        messages |= parse_ftl(file)
     return messages
 
 
@@ -62,7 +61,7 @@ def cli() -> None:
         raise ValueError("Empty request, wtf")
 
     if args.track_path:
-        print("Watching for changes in %s" % args.track_path)
+        print(f"Watching for changes in {args.track_path}")
         watch_ftl_dir(args.track_path, args.stub_path)
         return
 
