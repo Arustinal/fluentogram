@@ -5,7 +5,7 @@ https://projectfluent.org/fluent/guide/
 
 Short example:
 
-```
+```py
 # Somewhere in middleware.Grab language_code from telegram user object, or database, etc.
 translator_runner: TranslatorRunner = t_hub.get_translator_by_locale("en")
 
@@ -26,4 +26,4 @@ async def message_handler(message: Message, ..., i18n: TranslatorRunner):
     """
 ```
 
-Check *Examples* folder.
+Check [*Examples*](example) folder.

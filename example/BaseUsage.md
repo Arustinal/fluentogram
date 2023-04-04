@@ -1,4 +1,4 @@
-```
+```py
 example_ftl_file_content = """
 welcome = Welcome to the fluent aiogram addon!
 greet-by-name = Hello, { $user }!
