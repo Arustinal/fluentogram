@@ -22,10 +22,8 @@ class Stubs:
         for path, node in self.nodes.items():
             if node.is_leaf:
                 continue
-            if node.path:
-                knot = Knot(node.path)
-            else:
-                knot = Runner(self.root)
+
+            knot = Knot(node.path) if node.path else Runner(self.root)
             if node.children:
                 if node.value:
                     knot.add_method(

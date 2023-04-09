@@ -14,9 +14,7 @@ class TreeNode:
 
     @property
     def is_leaf(self) -> bool:
-        if not self.children:
-            return True
-        return False
+        return not self.children
 
 
 class Tree:
