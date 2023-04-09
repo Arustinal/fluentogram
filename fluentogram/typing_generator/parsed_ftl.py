@@ -1,18 +1,20 @@
-from typing import Dict
+from typing import Dict, Tuple, TypeVar, Type
 from typing import Iterator
 
 from fluent.syntax import FluentParser
 from fluent.syntax.ast import Message
-from fluent.syntax.ast import SyntaxNode
+from ordered_set import OrderedSet
 
 from fluentogram.typing_generator.translation_dto import Translation
+
+T = TypeVar("T")
 
 
 class ParsedRawFTL:
     def __init__(self, ftl_data: str, parser=FluentParser()) -> None:
         self.parsed_ftl = parser.parse(ftl_data)
 
-    def _filter_elements(self, cls_type) -> Iterator[SyntaxNode]:
+    def _filter_elements(self, cls_type: Type[T]) -> Iterator[T]:
         for element in self.parsed_ftl.body:
             if isinstance(element, cls_type):
                 yield element
@@ -31,8 +33,8 @@ class ParsedRawFTL:
     #     'named': [], 'type': 'CallArguments'}, 'type': 'FunctionReference'}
 
     @staticmethod
-    def _construct_translation(chunks: list) -> tuple:
-        translation_vars = []
+    def _construct_translation(chunks: list) -> Tuple[OrderedSet, str]:
+        translation_vars = OrderedSet()
         translation = ""
         for chunk in chunks:
             if content := getattr(chunk, "value", None):
@@ -40,7 +42,7 @@ class ParsedRawFTL:
             else:
                 chunk_json = chunk.expression.to_json()
                 if chunk_json["type"] == "VariableReference":
-                    translation_vars.append(chunk_json["id"]["name"])
+                    translation_vars.add(chunk_json["id"]["name"])
                     translation += f"{{ ${chunk.expression.id.name} }}"
                 elif chunk_json["type"] == "FunctionReference":
                     func_vars = [v for v in chunk_json["arguments"].get("positional", []) if
@@ -48,7 +50,7 @@ class ParsedRawFTL:
                     vars_names = [v['id']['name'] for v in func_vars]
                     vars_names_with_prefix = [f"${v}" for v in vars_names]
                     translation += f"{{ {chunk.expression.id.name}({', '.join(vars_names_with_prefix)}) }}"
-                    translation_vars.extend(vars_names)
+                    translation_vars.add(vars_names)
 
         return translation_vars, translation
 

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from ordered_set import OrderedSet
+
 from fluentogram.typing_generator.translation_dto import Translation
 
 
@@ -10,7 +12,7 @@ class TreeNode:
     children: dict[str, "TreeNode"]
     name: str
     value: Optional[str] = None
-    translation_vars: Optional[list] = None
+    translation_vars: Optional[OrderedSet] = None
 
     @property
     def is_leaf(self) -> bool:
@@ -37,13 +39,13 @@ class Tree:
         clean_path = map(lambda s: s[0].capitalize() + s[1:], filter(lambda x: x, path))
         return self.safe_separator.join(clean_path)
 
-    def _build(self, path: tuple[str, ...], name: str, value=None) -> None:
+    def _build(self, path: tuple[str, ...], name: str, value: Optional[Translation] = None) -> None:
         own_class_def = TreeNode(
             path=self.path_to_str(path + (name,)),
             name=name,
             value=value.text if value else "",
             children={},
-            translation_vars=value.args if value else [],
+            translation_vars=value.args if value else OrderedSet(),
         )
 
         if path:

@@ -14,6 +14,7 @@ python = "^3.9"
 fluent-compiler = "^0.3"
 watchdog = "^2.3.0"
 jinja2 = {version = "^3.1.2", extras = ["stub"]}
+ordered-set = "^4.1.0"
 
 [tool.poetry.dev-dependencies]
 
