@@ -34,13 +34,20 @@ shop-success-payment = Your money, { $amount }, has been sent successfully at { 
             root_locale="en",
         )
         translator_runner: TranslatorRunner = t_hub.get_translator_by_locale("en")
+
+        # Welcome to the fluent aiogram addon!
+        # Hello, Alex!
+        # Your money, $500.00, has been sent successfully at Apr 10, 2023.
         print(
+            "You have to manually check the correctness of the output:\n",
             translator_runner.welcome(),
-            "\n",
             translator_runner.greet.by.name(user="Alex"),
-            "\n",
             translator_runner.shop.success.payment(
                 amount=MoneyTransformer(currency="$", amount=Decimal("500")),
                 dt=DateTimeTransformer(datetime.now()),
             ),
+            sep="\n",
         )
+
+        assert translator_runner.welcome() == "Welcome to the fluent aiogram addon!"
+        assert translator_runner.greet.by.name(user="Alex") == "Hello, Alex!"
