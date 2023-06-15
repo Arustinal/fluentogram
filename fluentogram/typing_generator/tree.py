@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from ordered_set import OrderedSet
+
 from fluentogram.typing_generator.translation_dto import Translation
 
 
@@ -10,7 +12,7 @@ class TreeNode:
     children: dict[str, "TreeNode"]
     name: str
     value: Optional[str] = None
-    translation_vars: Optional[list] = None
+    translation_vars: Optional[OrderedSet] = None
 
     @property
     def is_leaf(self) -> bool:
@@ -45,7 +47,7 @@ class Tree:
             name=name,
             value=value.text if value else "",
             children={},
-            translation_vars=value.args if value else [],
+            translation_vars=value.args if value else OrderedSet(),
         )
 
         if path:
