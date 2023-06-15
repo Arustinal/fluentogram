@@ -13,6 +13,7 @@ i18n = 'fluentogram.cli:cli'
 python = "^3.9"
 fluent-compiler = "^0.3"
 watchdog = "^2.3.0"
+ordered-set = "^4.1.0"
 
 [tool.poetry.dev-dependencies]
 
