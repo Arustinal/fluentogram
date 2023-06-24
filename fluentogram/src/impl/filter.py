@@ -24,7 +24,7 @@ class FText(BaseFilter):
         Fluentogram text filter in the spirit of the deprecated aiogram Text filter.
 
         Usage example:
-            @router.message(FText(equals="command-help")
+            @router.message(FText(equals="command-help"))
             async def helpCommand(message: Message, i18n: TranslatorRunner) -> TelegramMethod[Any]:
                 return message.answer(i18n.help())
         """
