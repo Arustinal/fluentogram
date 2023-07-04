@@ -1,7 +1,10 @@
 # coding=utf-8
 from typing import Optional, List
 
-from jinja2 import Template
+try:
+    from jinja2 import Template
+except ModuleNotFoundError:
+    raise ModuleNotFoundError("You should install Jinja2 package to use cli tools")
 
 
 class RenderAble:
