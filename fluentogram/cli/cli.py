@@ -59,7 +59,7 @@ def cli() -> None:
     args = parser.parse_args()
 
     if not args.ftl_path and not args.track_path and not args.dir_path:
-        print("Use 'i18n -help' to see help message")
+        print("Use 'i18n --help' to see help message")
         return
 
     if args.track_path:
