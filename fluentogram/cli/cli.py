@@ -59,7 +59,8 @@ def cli() -> None:
     args = parser.parse_args()
 
     if not args.ftl_path and not args.track_path and not args.dir_path:
-        raise ValueError("Empty request, wtf")
+        print("Use 'i18n --help' to see help message")
+        return
 
     if args.track_path:
         print("Watching for changes in %s" % args.track_path)
