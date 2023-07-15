@@ -26,5 +26,5 @@ Note: *Any variables for TranslatorRunner should be passed like key-word argumen
 between attribute name and content*
 
 Remember to be careful with count of subkeys (in example - "say" and "hello"). Very big count can slow things down. If
-it needed - you can use `i18n.get("say-hello")(username=...)`
+it needed - you can use `i18n.get("say-hello", username=...)`
 instead of classic sugar-typed dot access method.
