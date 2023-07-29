@@ -29,7 +29,7 @@ setup_kwargs = {
     "author_email": None,
     "maintainer": None,
     "maintainer_email": None,
-    "url": "https://github.com/Arustinal/fluentogram",
+    "url": "https://github.com/Like6po/fluentogram",
     "packages": packages,
     "package_data": package_data,
     "install_requires": install_requires,
