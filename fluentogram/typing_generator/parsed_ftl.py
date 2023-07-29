@@ -28,14 +28,14 @@ class Node:
     args: list[str]
 
 
-@dataclass
-class Reference:
-    name: str
+class ReferenceNotExists(Exception):
+    pass
 
 
 class ParsedRawFTL:
     def __init__(self, ftl_data: str, parser=FluentParser()) -> None:
         self.parsed_ftl = parser.parse(ftl_data)
+        self.nodes: dict[str, Node]
 
     def _parse_literal(self, obj: Literal) -> Node:
         return Node(value=obj.parse()["value"], args=[])
@@ -47,8 +47,10 @@ class ParsedRawFTL:
         data = obj.parse()
         return Node(value=str(f"{data['value']:.{data['precision']}f}"), args=[])
 
-    def _parse_message_reference(self, obj: MessageReference) -> Reference:
-        return Reference(name=obj.id.name)
+    def _parse_message_reference(self, obj: MessageReference) -> Node:
+        if obj.id.name not in self.nodes:
+            raise ReferenceNotExists
+        return self.nodes[obj.id.name]
 
     def _parse_text_element(self, obj: TextElement) -> Node:
         return Node(value=obj.value, args=[])
@@ -59,10 +61,8 @@ class ParsedRawFTL:
     def _parse_named_argument(self, obj: NamedArgument) -> Node:
         if isinstance(obj.value, NumberLiteral):
             value = self._parse_number_literal(obj.value)
-        elif isinstance(obj.value, StringLiteral):
+        else:  # StringLiteral
             value = self._parse_string_literal(obj.value)
-        else:
-            raise RuntimeError("Wrong NamedArgument type expected")
         return Node(value=f"{obj.name.name}: {value.value}", args=[])
 
     def _parse_function_reference(self, obj: FunctionReference) -> Node:
@@ -73,10 +73,8 @@ class ParsedRawFTL:
         for positional in obj.arguments.positional:
             if isinstance(positional, Placeable):
                 positionals.append(self._parse_placeable(positional))
-            elif isinstance(positional, InlineExpression):
+            else:  # InlineExpression
                 positionals.append(self._parse_inline_expression(positional))
-            else:
-                raise RuntimeError("Wrong CallArguments.positional type expected")
 
         named_args_string = ", ".join([named_arg.value for named_arg in named_args])
         positional_string = ", ".join([positional.value for positional in positionals])
@@ -90,9 +88,7 @@ class ParsedRawFTL:
             args=positional_args,
         )
 
-    def _parse_inline_expression(
-        self, obj: InlineExpression
-    ) -> Node | Reference | None:
+    def _parse_inline_expression(self, obj: InlineExpression) -> Node:
         if isinstance(obj, NumberLiteral):
             return self._parse_number_literal(obj)
         elif isinstance(obj, StringLiteral):
@@ -106,12 +102,13 @@ class ParsedRawFTL:
             return self._parse_variable_reference(obj)
         elif isinstance(obj, FunctionReference):
             return self._parse_function_reference(obj)
-        return None
+        return Node(value="", args=[])
 
     def _parse_select_expression(self, obj: SelectExpression) -> Node:
         selector = self._parse_inline_expression(obj.selector)
+        value = f"{{ {', '.join([f'${s}' for s in selector.args])} ->"
+        args = selector.args
 
-        variants = []
         for variant in obj.variants:
             for element in variant.value.elements:
                 if isinstance(element, TextElement):
@@ -120,29 +117,13 @@ class ParsedRawFTL:
                     variant_node = self._parse_placeable(element)
                 else:
                     continue
-                variants.append(
-                    {
-                        "node": variant_node,
-                        "is_default": variant.default,
-                        "name": variant.key.name,
-                    }
-                )
+                value += f"\n{'*' if variant.default else ''}[{variant.key.name}] {variant_node.value}"
+                args += variant_node.args
 
-        value = f"{{ {', '.join([f'${s}' for s in selector.args])} }} ->\n"
-        value += "\n".join(
-            [
-                f"{'*' if variant['is_default'] else ''}[{variant['name']}] {variant['node'].value}"
-                for variant in variants
-            ]
-        )
         value += "\n}"
-        args = selector.args
-        for variant in variants:
-            args += variant["node"].args
-
         return Node(value=value, args=args)
 
-    def _parse_placeable(self, obj: Placeable) -> Node | Reference | None:
+    def _parse_placeable(self, obj: Placeable) -> Node:
         ex = obj.expression
         if isinstance(ex, VariableReference):
             return self._parse_variable_reference(ex)
@@ -150,82 +131,43 @@ class ParsedRawFTL:
             return self._parse_select_expression(ex)
         elif isinstance(ex, InlineExpression):
             return self._parse_inline_expression(ex)
-        return None
+        elif isinstance(ex, Placeable):
+            return self._parse_placeable(ex)
+        return Node(value="", args=[])
 
-    def _parse_patterns(self) -> dict[str, list[Node, Reference]]:
-        patterns: dict[str, list[Node | Reference]] = {}
+    def _parse_message(self, obj: Message) -> Node:
+        nodes: list[Node] = []
+        for element in obj.value.elements:
+            if isinstance(element, TextElement):
+                nodes.append(self._parse_text_element(element))
+            elif isinstance(element, Placeable):
+                nodes.append(self._parse_placeable(element))
+            else:
+                continue
+
+        node_value, node_args = "", []
+        for sub_node in nodes:
+            node_value += sub_node.value
+            node_args += sub_node.args
+        return Node(value=node_value, args=node_args)
+
+    def _parse_body(self) -> dict[str, Node]:
+        self.nodes: dict[str, Node] = {}
         for message in self.parsed_ftl.body:
             if not isinstance(message, Message):
                 # TODO: other Entry
                 continue
             if message.value is None:
                 continue
-            for element in message.value.elements:
-                if isinstance(element, TextElement):
-                    data = self._parse_text_element(element)
-                elif isinstance(element, Placeable):
-                    data = self._parse_placeable(element)
-                else:
-                    continue
-                if message.id.name not in patterns:
-                    patterns[message.id.name] = [data]
-                else:
-                    patterns[message.id.name].append(data)
-        return patterns
-
-    def _split_patterns_by_type(
-        self, patterns: dict[str, list[Node, Reference]]
-    ) -> tuple[dict[str, list[Node]], dict[str, list[Node, Reference]]]:
-        full_nodes_patterns: dict[str, list[Node]] = {}
-        mixed_patterns: dict[str, list[Node, Reference]] = {}
-        for name, translation in patterns.items():
-            is_have_reference = False
-            for sub_translation in translation:
-                if isinstance(sub_translation, Reference):
-                    is_have_reference = True
-                    break
-            if not is_have_reference:
-                full_nodes_patterns[name] = translation
-            else:
-                mixed_patterns[name] = translation
-        return full_nodes_patterns, mixed_patterns
-
-    def _merge_patterns(
-        self, patterns: dict[str, list[Node, Reference]]
-    ) -> dict[str, Node]:
-        merged_patterns: dict[str, Node] = {}
-
-        full_nodes_patterns, mixed_patterns = self._split_patterns_by_type(patterns)
-
-        for name, translation in full_nodes_patterns.items():
-            node_value, node_args = "", []
-            for sub_translation in translation:
-                node_value += sub_translation.value
-                node_args += sub_translation.args
-            merged_patterns[name] = Node(value=node_value, args=node_args)
-
-        for name, translation in mixed_patterns.items():
-            node_value, node_args = "", []
-            for sub_translation in translation:
-                if isinstance(sub_translation, Node):
-                    node_value += sub_translation.value
-                    node_args += sub_translation.args
-                elif isinstance(sub_translation, Reference):
-                    if sub_translation.name not in merged_patterns:
-                        continue
-                    target_node = merged_patterns[sub_translation.name]
-                    node_value += target_node.value
-                    node_args += target_node.args
-            merged_patterns[name] = Node(value=node_value, args=node_args)
-
-        return merged_patterns
+            try:
+                self.nodes[message.id.name] = self._parse_message(message)
+            except ReferenceNotExists:
+                self.parsed_ftl.body.append(message)
+                continue
+        return self.nodes
 
     def get_messages(self) -> Dict[str, Translation]:
-        raw_patterns = self._parse_patterns()
-        merged_patterns = self._merge_patterns(raw_patterns)
-        messages = {}
-        for name, translation in merged_patterns.items():
-            messages[name] = Translation(
-                translation.value, args=OrderedSet(translation.args)
-            )
-        return messages
+        return {
+            name: Translation(node.value, args=OrderedSet(node.args))
+            for name, node in self._parse_body().items()
+        }
