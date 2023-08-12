@@ -16,6 +16,7 @@ from fluent.syntax.ast import (
     FunctionReference,
     InlineExpression,
     NamedArgument,
+    Identifier,
 )
 from ordered_set import OrderedSet
 
@@ -117,7 +118,13 @@ class ParsedRawFTL:
                     variant_node = self._parse_placeable(element)
                 else:
                     continue
-                value += f"\n{'*' if variant.default else ''}[{variant.key.name}] {variant_node.value}"
+                if isinstance(variant.key, Identifier):
+                    key_name = variant.key.name
+                elif isinstance(variant.key, NumberLiteral):
+                    key_name = self._parse_number_literal(variant.key).value
+                else:
+                    continue
+                value += f"\n{'*' if variant.default else ''}[{key_name}] {variant_node.value}"
                 args += variant_node.args
 
         value += "\n}"

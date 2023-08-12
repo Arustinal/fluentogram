@@ -95,6 +95,29 @@ class Test:
 ''',
         )
 
+    def test_selector_num_key(self):
+        self.assertEquals(
+            self._gen_stub_text(
+                """test-bool_indicator = { $is_true ->
+                    [0] ✅
+                    *[other] ❌
+                } """
+            ),
+            self.DEFAULT_STUB_TEXT
+            + '''
+    test: Test
+
+
+class Test:
+    @staticmethod
+    def bool_indicator(*, is_true) -> Literal["""{ $is_true -&gt;
+[0] ✅
+*[other] ❌
+}"""]: ...
+
+''',
+        )
+
     def test_recursion(self):
         self.assertEquals(
             self._gen_stub_text(
