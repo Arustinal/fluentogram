@@ -87,8 +87,31 @@ class ShopSuccess:
 
 class Test:
     @staticmethod
-    def bool_indicator(*, is_true) -> Literal["""{ $is_true } -&gt;
+    def bool_indicator(*, is_true) -> Literal["""{ $is_true -&gt;
 [one] ✅
+*[other] ❌
+}"""]: ...
+
+''',
+        )
+
+    def test_selector_num_key(self):
+        self.assertEquals(
+            self._gen_stub_text(
+                """test-bool_indicator = { $is_true ->
+                    [0] ✅
+                    *[other] ❌
+                } """
+            ),
+            self.DEFAULT_STUB_TEXT
+            + '''
+    test: Test
+
+
+class Test:
+    @staticmethod
+    def bool_indicator(*, is_true) -> Literal["""{ $is_true -&gt;
+[0] ✅
 *[other] ❌
 }"""]: ...
 
@@ -112,13 +135,13 @@ class Test:
             self.DEFAULT_STUB_TEXT
             + '''
     @staticmethod
-    def recursion(*, is_true) -> Literal["""{ $is_true } -&gt;
+    def recursion(*, is_true) -> Literal["""{ $is_true -&gt;
 [one] one
 *[other] Recursion 
-*[other] { $is_true } -&gt;
+*[other] { $is_true -&gt;
 [one] one
 *[other] Recursion 
-*[other] { $is_true } -&gt;
+*[other] { $is_true -&gt;
 [one] one
 *[other] Recursion
 }
@@ -175,6 +198,39 @@ ref = { var }
 
     @staticmethod
     def ref(*, name) -> Literal["""{ $name }"""]: ...
+
+''',
+        )
+
+    def test_message_reference_in_selector(self):
+        self.assertEquals(
+            self._gen_stub_text(
+                """foo = { $var ->
+[test] { test }
+*[any] any text
+}
+test = { $is_true ->
+[one] true
+*[other] false
+}
+"""
+            ),
+            self.DEFAULT_STUB_TEXT
+            + '''
+    @staticmethod
+    def test(*, is_true) -> Literal["""{ $is_true -&gt;
+[one] true
+*[other] false
+}"""]: ...
+
+    @staticmethod
+    def foo(*, var, is_true) -> Literal["""{ $var -&gt;
+[test] { $is_true -&gt;
+[one] true
+*[other] false
+}
+*[any] any text
+}"""]: ...
 
 ''',
         )
