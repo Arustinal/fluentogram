@@ -3,7 +3,7 @@
 A MoneyTransformer by itself
 """
 from decimal import Decimal
-from typing import Literal, Union
+from typing import Literal, Union, Optional
 
 from fluent_compiler.types import fluent_number, FluentNumber, FluentNone
 
@@ -23,10 +23,10 @@ class MoneyTransformer(AbstractDataTransformer):
             Literal["code"], Literal["symbol"], Literal["name"]
         ] = "code",
         use_grouping: bool = False,
-        minimum_significant_digits: int = None,
-        maximum_significant_digits: int = None,
-        minimum_fraction_digits: int = None,
-        maximum_fraction_digits: int = None,
+        minimum_significant_digits: Optional[int] = None,
+        maximum_significant_digits: Optional[int] = None,
+        minimum_fraction_digits: Optional[int] = None,
+        maximum_fraction_digits: Optional[int] = None,
         **kwargs
     ) -> Union[FluentNumber, FluentNone]:
         return fluent_number(

@@ -1,5 +1,5 @@
 # coding=utf-8
-from typing import Optional, List
+from typing import Optional, List, Iterable
 
 try:
     from jinja2 import Template
@@ -29,7 +29,7 @@ class Method(RenderAble):
     )
 
     def __init__(
-            self, method_name: str, translation: str, args: Optional[list] = None
+            self, method_name: str, translation: str, args: Optional[Iterable[str]] = None
     ) -> None:
         if args:
             formatted_args = "*, " + ", ".join(args)
@@ -40,7 +40,7 @@ class Method(RenderAble):
 
 
 class InternalMethod(Method):
-    def __init__(self, translation: str, args: Optional[list] = None) -> None:
+    def __init__(self, translation: str, args: Optional[Iterable[str]] = None) -> None:
         super().__init__(method_name="__call__", translation=translation, args=args)
 
 
@@ -49,7 +49,7 @@ class Var(RenderAble):
         "    {{ var_name }}: {{ var_full_name }}", autoescape=True
     )
 
-    def __init__(self, var_name: str, var_full_name: str = None) -> None:
+    def __init__(self, var_name: str, var_full_name: Optional[str] = None) -> None:
         super().__init__(
             var_name=var_name,
             var_full_name=var_name if not var_full_name else var_full_name,
