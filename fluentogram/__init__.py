@@ -11,9 +11,10 @@ from .src.impl import (
 
 __all__ = [
     "AttribTracer",
-    "FluentTranslator",
-    "TranslatorRunner",
-    "TranslatorHub",
-    "MoneyTransformer",
     "DateTimeTransformer",
+    "FluentTranslator",
+    "MoneyTransformer",
+    "TranslatorHub",
+    "TranslatorRunner",
+    "misc",
 ]
