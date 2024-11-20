@@ -5,6 +5,7 @@ from .src.impl import (
     FluentTranslator,
     TranslatorRunner,
     TranslatorHub,
+    KvTranslatorHub,
     MoneyTransformer,
     DateTimeTransformer,
 )
@@ -16,5 +17,6 @@ __all__ = [
     "MoneyTransformer",
     "TranslatorHub",
     "TranslatorRunner",
+    "KvTranslatorHub",
     "misc",
 ]
