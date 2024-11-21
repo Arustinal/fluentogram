@@ -1,3 +1,7 @@
+# coding=utf-8
+"""
+NATS-based storage
+"""
 import asyncio
 from collections import defaultdict
 from typing import Any, NoReturn, TypeAlias, Optional
@@ -7,7 +11,7 @@ from fluent_compiler.compiler import compile_messages
 from fluent_compiler.resource import FtlResource
 from nats.aio.msg import Msg
 from nats.js import JetStreamContext
-from nats.js.kv import KeyValue, KV_OP, KV_DEL
+from nats.js.kv import KeyValue, KV_OP, KV_DEL, KV_PURGE
 
 from fluentogram.src.abc.storage import AbstractStorage
 
@@ -95,9 +99,10 @@ class NatsStorage(AbstractStorage):
     async def _update_compiled_messages(self, messages: list[Msg]):
         changes = defaultdict(list)
         for m in messages:
+            print(m)
             kind = m.headers.get(KV_OP) if m.headers is not None else None
             *args, locale, key = m.subject.split(self.separator)
-            if kind == KV_DEL:
+            if kind in (KV_DEL, KV_PURGE):
                 self.messages[locale].pop(key, None)
             else:
                 value = ormsgpack.unpackb(m.data)
@@ -110,3 +115,4 @@ class NatsStorage(AbstractStorage):
             resources = [FtlResource.from_string(message) for message in messages]
             compiled_ftl = compile_messages(locale, resources)
             self.messages[locale].update(compiled_ftl.message_functions)
+            

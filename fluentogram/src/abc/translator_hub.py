@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-An abstract base for the Translator Hub object
+An abstract base for the Translator Hub and Key/Value Translator Hub objects
 """
 from abc import ABC, abstractmethod
 from typing import Self, Any

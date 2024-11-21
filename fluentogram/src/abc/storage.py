@@ -1,5 +1,9 @@
+# coding=utf-8
+"""
+An abstract base for the Storage object
+"""
 from abc import ABC, abstractmethod
-from typing import Any, Iterable
+from typing import Any
 
 
 class AbstractStorage(ABC):

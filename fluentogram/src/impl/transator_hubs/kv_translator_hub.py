@@ -1,3 +1,7 @@
+# coding=utf-8
+"""
+A Key/Value Translator Hub, using as factory for Translator objects
+"""
 import asyncio
 
 from typing import Dict, Iterable, Union, Optional, List, Any
@@ -79,7 +83,7 @@ class KvTranslatorHub(TranslatorHub, AbstractKvTranslatorHub):
                                      mapping_values)
 
     async def delete(self, locale: str, *keys):
-        await self.kv_storage.delete(locale=locale, *keys)
+        await self.kv_storage.delete(locale, *keys)
 
     def _create_translators(self) -> list[FluentTranslator]:
         translators = []
