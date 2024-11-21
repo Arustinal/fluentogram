@@ -3,10 +3,10 @@
 NATS-based storage
 """
 import asyncio
+import json
 from collections import defaultdict
 from typing import Any, NoReturn, TypeAlias, Optional
 
-import ormsgpack
 from fluent_compiler.compiler import compile_messages
 from fluent_compiler.resource import FtlResource
 from nats.aio.msg import Msg
@@ -19,12 +19,22 @@ KeyType: TypeAlias = Optional[str]
 ValueType: TypeAlias = Optional[Any]
 MappingValuesType: TypeAlias = Optional[dict[KeyType, ValueType]]
 
+
 class NatsStorage(AbstractStorage):
-    def __init__(self, kv: KeyValue, js: JetStreamContext, separator: str = '.'):
+    def __init__(
+            self,
+            kv: KeyValue,
+            js: JetStreamContext,
+            separator: str = '.',
+            serializer=lambda data: json.dumps(data).encode('utf-8'),
+            deserializer=json.loads
+    ):
         self._kv = kv
         self._js = js
         self.separator = separator
         self.messages = None
+        self.serializer = serializer
+        self.deserializer = deserializer
 
     async def put(
             self,
@@ -73,11 +83,11 @@ class NatsStorage(AbstractStorage):
             mapping_values: MappingValuesType
     ):
         if key and value:
-            await func(f'{locale}{self.separator}{key}', ormsgpack.packb(value))
+            await func(f'{locale}{self.separator}{key}', self.serializer(value))
         if mapping_values:
             await asyncio.gather(
                 *[
-                    func(f'{locale}{self.separator}{m_key}', ormsgpack.packb(m_value))
+                    func(f'{locale}{self.separator}{m_key}', self.serializer(m_value))
                     for m_key, m_value in mapping_values.items()
                 ]
             )
@@ -86,7 +96,7 @@ class NatsStorage(AbstractStorage):
         self.messages = messages
         stream = await self._js.stream_info(self._kv._stream)
         stream_name = stream.config.name
-        subject = f'${stream_name.replace('_', '.', 1)}.>'
+        subject = f'${stream_name.replace('_', self.separator, 1)}.>'
         consumer = await self._js.pull_subscribe(subject=subject, stream=stream_name)
         while True:
             try:
@@ -99,13 +109,12 @@ class NatsStorage(AbstractStorage):
     async def _update_compiled_messages(self, messages: list[Msg]):
         changes = defaultdict(list)
         for m in messages:
-            print(m)
             kind = m.headers.get(KV_OP) if m.headers is not None else None
             *args, locale, key = m.subject.split(self.separator)
             if kind in (KV_DEL, KV_PURGE):
                 self.messages[locale].pop(key, None)
             else:
-                value = ormsgpack.unpackb(m.data)
+                value = self.deserializer(m.data)
                 changes[locale].append(f'{key} = {value}')
             await m.ack()
         self._set_new_compiled_messages(changes)
@@ -115,4 +124,3 @@ class NatsStorage(AbstractStorage):
             resources = [FtlResource.from_string(message) for message in messages]
             compiled_ftl = compile_messages(locale, resources)
             self.messages[locale].update(compiled_ftl.message_functions)
-            
