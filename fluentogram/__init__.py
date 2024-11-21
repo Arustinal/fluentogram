@@ -8,6 +8,7 @@ from .src.impl import (
     KvTranslatorHub,
     MoneyTransformer,
     DateTimeTransformer,
+    NatsStorage,
 )
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     "TranslatorRunner",
     "KvTranslatorHub",
     "misc",
+    "NatsStorage",
 ]
