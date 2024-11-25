@@ -4,8 +4,13 @@ NATS-based storage
 """
 import asyncio
 import json
+import sys
 from collections import defaultdict
-from typing import Any, NoReturn, TypeAlias, Optional
+if sys.version_info >= (3, 10):
+    from typing import Any, NoReturn, TypeAlias, Optional
+else:
+    from typing import Any, NoReturn, Optional
+    from typing_extensions import TypeAlias
 
 from fluent_compiler.compiler import compile_messages
 from fluent_compiler.resource import FtlResource

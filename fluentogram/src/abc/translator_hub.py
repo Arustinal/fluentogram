@@ -2,8 +2,13 @@
 """
 An abstract base for the Translator Hub and Key/Value Translator Hub objects
 """
+import sys
 from abc import ABC, abstractmethod
-from typing import Self, Any
+if sys.version_info >= (3, 11):
+    from typing import Self, Any
+else:
+    from typing import Any
+    from typing_extensions import Self
 
 from fluentogram.src.abc.runner import AbstractTranslatorRunner
 from fluentogram.src.abc.storage import AbstractStorage
