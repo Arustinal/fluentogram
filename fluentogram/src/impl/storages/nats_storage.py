@@ -96,7 +96,8 @@ class NatsStorage(AbstractStorage):
         self.messages = messages
         stream = await self._js.stream_info(self._kv._stream)
         stream_name = stream.config.name
-        subject = f'${stream_name.replace('_', self.separator, 1)}.>'
+        subject_name = stream_name.replace("_", self.separator, 1)
+        subject = f'${subject_name}.>'
         consumer = await self._js.pull_subscribe(subject=subject, stream=stream_name)
         while True:
             try:
