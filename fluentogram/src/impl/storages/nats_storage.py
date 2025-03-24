@@ -32,7 +32,8 @@ class NatsStorage(AbstractStorage):
             js: JetStreamContext,
             separator: str = '.',
             serializer=lambda data: json.dumps(data).encode('utf-8'),
-            deserializer=json.loads
+            deserializer=json.loads,
+            consume_timeout: float = 1.0
     ):
         self._kv = kv
         self._js = js
@@ -40,6 +41,7 @@ class NatsStorage(AbstractStorage):
         self.messages = None
         self.serializer = serializer
         self.deserializer = deserializer
+        self.consume_timeout = consume_timeout
 
     async def put(
             self,
@@ -106,7 +108,7 @@ class NatsStorage(AbstractStorage):
         consumer = await self._js.pull_subscribe(subject=subject, stream=stream_name)
         while True:
             try:
-                messages: list[Msg] = await consumer.fetch(50)
+                messages: list[Msg] = await consumer.fetch(50, timeout=self.consume_timeout)
             except TimeoutError:
                 pass
             else:
