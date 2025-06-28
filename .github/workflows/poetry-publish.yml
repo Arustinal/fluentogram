@@ -19,7 +19,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -28,11 +28,9 @@ jobs:
 
       - name: Build and publish to test PyPI
         run: |
-          poetry build
-
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.POETRY_PYPI_TOKEN }}
-          poetry publish -r test-pypi
+          poetry publish -r test-pypi --build
 
   release:
     name: Release Package to PyPI
@@ -47,7 +45,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
@@ -56,7 +54,5 @@ jobs:
 
       - name: Build and publish to PyPI
         run: |
-          poetry build
-
           poetry config pypi-token.pypi ${{ secrets.PYPI_PROD_TOKEN }}
-          poetry publish
+          poetry publish --build
