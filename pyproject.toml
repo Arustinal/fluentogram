@@ -1,21 +1,23 @@
-[tool.poetry]
+[project]
 name = "fluentogram"
 version = "1.1.12"
 description = "A proper way to use an i18n mechanism with Aiogram3."
-authors = ["Aleks"]
+authors = [{ name = "Aleks" }]
+requires-python = "~=3.9"
 license = "MIT"
-repository = "https://github.com/Arustinal/fluentogram"
+dependencies = [
+    "fluent-compiler~=1.1",
+    "watchdog>=2.3.0,<3",
+    "ordered-set>=4.1.0,<5",
+    "nats-py>=2.9.0,<3",
+    "typing-extensions>=4.12.2,<5",
+]
 
-[tool.poetry.scripts]
-i18n = 'fluentogram.cli:cli'
+[project.urls]
+Repository = "https://github.com/Arustinal/fluentogram"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-fluent-compiler = "^1.1"
-watchdog = "^2.3.0"
-ordered-set = "^4.1.0"
-nats-py = "^2.9.0"
-typing-extensions = "^4.12.2"
+[project.scripts]
+i18n = "fluentogram.cli:cli"
 
 [build-system]
 requires = ["setuptools>=42"]
