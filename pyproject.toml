@@ -3,16 +3,16 @@ name = "fluentogram"
 version = "1.1.13"
 description = "A proper way to use an i18n mechanism with Aiogram3."
 authors = [{ name = "Aleks" }]
-requires-python = "~=3.9"
+requires-python = ">=3.9"
 license = "MIT"
 dependencies = [
     "fluent-compiler~=1.1",
-    "typing-extensions>=4.12.2,<5",
 ]
 [project.optional-dependencies]
 cli = ["watchdog>=2.3.0,<3"]
-dev = ["ruff~=0.11.2"]
+dev = ["ruff~=0.11.2", "pytest~=8.4.1"]
 aiogram = ["aiogram~=3.20.0"]
+nats = ["nats-py~=2.10.0"]
 
 [project.urls]
 Repository = "https://github.com/Arustinal/fluentogram"
