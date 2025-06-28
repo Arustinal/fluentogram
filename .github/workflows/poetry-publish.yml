@@ -11,6 +11,8 @@ jobs:
     name: Release Package to PyPI
     runs-on: ubuntu-latest
     environment: main
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
