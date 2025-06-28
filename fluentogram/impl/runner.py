@@ -12,7 +12,7 @@ class TranslatorRunner(AbstractTranslatorRunner):
     def __init__(self, translators: Iterable[AbstractTranslator], separator: str = "-") -> None:
         self.translators = translators
         self.separator = separator
-        self.request_line = ""
+        self._request_line = ""
 
     def get(self, key: str, **kwargs: Any) -> str:
         """Fastest, direct way to use translator, without sugar-like typing supported attribute access way"""
@@ -25,3 +25,12 @@ class TranslatorRunner(AbstractTranslatorRunner):
                 return text
 
         raise KeyNotFoundError(key)
+
+    def __getattr__(self, item: str) -> "TranslatorRunner":
+        self._request_line += f"{item}{self.separator}"
+        return self
+
+    def __call__(self, **kwargs: Any) -> str:
+        text = self._get_translation(self._request_line.rstrip(self.separator), **kwargs)
+        self._request_line = ""
+        return text

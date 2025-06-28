@@ -7,8 +7,6 @@ requires-python = "~=3.9"
 license = "MIT"
 dependencies = [
     "fluent-compiler~=1.1",
-    "ordered-set>=4.1.0,<5",
-    "nats-py>=2.9.0,<3",
     "typing-extensions>=4.12.2,<5",
 ]
 [project.optional-dependencies]
