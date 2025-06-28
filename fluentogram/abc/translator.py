@@ -1,7 +1,5 @@
-# coding=utf-8
-"""
-Translator as itself
-"""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -16,9 +14,8 @@ class AbstractTranslator(ABC):
         self.translator = translator
 
     @abstractmethod
-    def get(self, key: str, **kwargs) -> str:
-        """
-        Convert a translation key to a translated text string.
+    def get(self, key: str, **kwargs: Any) -> str | None:
+        """Convert a translation key to a translated text string.
         Use kwargs dict to pass external data to the translator.
         Expects to be fast and furious.
         """

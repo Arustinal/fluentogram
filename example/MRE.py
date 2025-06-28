@@ -1,8 +1,9 @@
 import asyncio
 import os
-from typing import TYPE_CHECKING, Callable, Dict, Any, Awaitable
+from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING, Any
 
-from aiogram import Bot, Dispatcher, Router, BaseMiddleware
+from aiogram import BaseMiddleware, Bot, Dispatcher, Router
 from aiogram.types import Message
 from fluent_compiler.bundle import FluentBundle
 
@@ -15,13 +16,13 @@ if TYPE_CHECKING:
 class TranslatorRunnerMiddleware(BaseMiddleware):
     async def __call__(
             self,
-            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+            handler: Callable[[Message, dict[str, Any]], Awaitable[Any]],
             event: Message,
-            data: Dict[str, Any]
+            data: dict[str, Any],
     ) -> Any:
-        hub: TranslatorHub = data.get('_translator_hub')
+        hub: TranslatorHub = data.get("_translator_hub")
         # There you can ask your database for locale
-        data['i18n'] = hub.get_translator_by_locale(event.from_user.language_code)
+        data["i18n"] = hub.get_translator_by_locale(event.from_user.language_code)
         return await handler(event, data)
 
 
@@ -38,11 +39,11 @@ async def main():
     translator_hub = TranslatorHub(
         {
             "ru": ("ru", "en"),
-            "en": ("en",)
+            "en": ("en",),
         },
         [
             FluentTranslator("en", translator=FluentBundle.from_string("en-US", "start-hello = Hello, { $username }")),
-            FluentTranslator("ru", translator=FluentBundle.from_string("ru", "start-hello = Привет, { $username }"))
+            FluentTranslator("ru", translator=FluentBundle.from_string("ru", "start-hello = Привет, { $username }")),
         ],
     )
     bot = Bot(token=os.getenv("TOKEN"))
@@ -52,5 +53,5 @@ async def main():
     await dp.start_polling(bot, _translator_hub=translator_hub)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

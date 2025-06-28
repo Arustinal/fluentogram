@@ -1,13 +1,13 @@
-# coding=utf-8
-"""
-A MoneyTransformer by itself
-"""
+"""A MoneyTransformer by itself"""
+
+from __future__ import annotations
+
 from decimal import Decimal
-from typing import Literal, Union, Optional
+from typing import Literal
 
-from fluent_compiler.types import fluent_number, FluentNumber, FluentNone
+from fluent_compiler.types import FluentNone, FluentNumber, fluent_number
 
-from fluentogram.src.abc import AbstractDataTransformer
+from fluentogram.abc import AbstractDataTransformer
 
 
 class MoneyTransformer(AbstractDataTransformer):
@@ -15,20 +15,18 @@ class MoneyTransformer(AbstractDataTransformer):
     Typings refer to https://github.com/tc39/ecma402
     """
 
-    def __new__(
+    def __new__(  # noqa: PLR0913
         cls,
         amount: Decimal,
         currency: str,
-        currency_display: Union[
-            Literal["code"], Literal["symbol"], Literal["name"]
-        ] = "code",
-        use_grouping: bool = False,
-        minimum_significant_digits: Optional[int] = None,
-        maximum_significant_digits: Optional[int] = None,
-        minimum_fraction_digits: Optional[int] = None,
-        maximum_fraction_digits: Optional[int] = None,
-        **kwargs
-    ) -> Union[FluentNumber, FluentNone]:
+        currency_display: Literal["code", "symbol", "name"] = "code",
+        use_grouping: bool = False,  # noqa: FBT002
+        minimum_significant_digits: int | None = None,
+        maximum_significant_digits: int | None = None,
+        minimum_fraction_digits: int | None = None,
+        maximum_fraction_digits: int | None = None,
+        **kwargs,
+    ) -> FluentNumber | FluentNone:
         return fluent_number(
             amount,
             style="currency",
@@ -39,5 +37,5 @@ class MoneyTransformer(AbstractDataTransformer):
             maximumSignificantDigits=maximum_significant_digits,
             minimumFractionDigits=minimum_fraction_digits,
             maximumFractionDigits=maximum_fraction_digits,
-            **kwargs
+            **kwargs,
         )

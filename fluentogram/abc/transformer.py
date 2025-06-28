@@ -1,14 +1,11 @@
-# coding=utf-8
-"""
-An AbstractDataTransformer object, using to transform any data before being passed to translator directly.
-"""
+"""An AbstractDataTransformer object, using to transform any data before being passed to translator directly."""
+
 from abc import ABC, abstractmethod
 from typing import Any
 
 
 class AbstractDataTransformer(ABC):
-    """
-    These transformers inspired by Functions of Project Fluent by Mozilla.
+    """These transformers inspired by Functions of Project Fluent by Mozilla.
     Of course, it's a simple function, like a
 
     def function(money: Union[int, float], **kwargs) -> str: ...
@@ -17,7 +14,8 @@ class AbstractDataTransformer(ABC):
     """
 
     @abstractmethod
-    def __new__(cls, data: Any, **kwargs) -> Any:
+    def __new__(cls, data: Any, **kwargs: Any) -> Any:
         """Using incoming data, create an object representation of these data for your translator via all needed
-        parameters using kwargs"""
+        parameters using kwargs
+        """
         raise NotImplementedError
