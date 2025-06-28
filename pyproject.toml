@@ -17,8 +17,6 @@ ordered-set = "^4.1.0"
 nats-py = "^2.9.0"
 typing-extensions = "^4.12.2"
 
-[tool.poetry.dev-dependencies]
-
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
