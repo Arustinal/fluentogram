@@ -3,13 +3,12 @@
 from collections.abc import Iterable
 from typing import Any
 
-from fluentogram.abc import AbstractTranslator
-from fluentogram.abc.runner import AbstractTranslatorRunner
 from fluentogram.exceptions import KeyNotFoundError
+from fluentogram.translator import FluentTranslator
 
 
-class TranslatorRunner(AbstractTranslatorRunner):
-    def __init__(self, translators: Iterable[AbstractTranslator], separator: str = "-") -> None:
+class TranslatorRunner:
+    def __init__(self, translators: Iterable[FluentTranslator], separator: str = "-") -> None:
         self.translators = translators
         self.separator = separator
         self._request_line = ""

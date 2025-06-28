@@ -6,7 +6,7 @@ from datetime import datetime
 
 from fluent_compiler.types import FluentDateType, FluentNone, fluent_date
 
-from fluentogram.abc import AbstractDataTransformer
+from fluentogram.transformers.base import AbstractDataTransformer
 
 
 class DateTimeTransformer(AbstractDataTransformer):

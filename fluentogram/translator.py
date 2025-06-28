@@ -6,11 +6,10 @@ from typing import Any
 
 from fluent_compiler.bundle import FluentBundle
 
-from fluentogram.abc import AbstractTranslator
 from fluentogram.exceptions import FormatError
 
 
-class FluentTranslator(AbstractTranslator):
+class FluentTranslator:
     """Single-locale Translator, implemented with fluent_compiler Bundles"""
 
     def __init__(self, locale: str, translator: FluentBundle, separator: str = "-") -> None:

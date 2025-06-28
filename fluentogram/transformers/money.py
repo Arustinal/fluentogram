@@ -7,7 +7,7 @@ from typing import Literal
 
 from fluent_compiler.types import FluentNone, FluentNumber, fluent_number
 
-from fluentogram.abc import AbstractDataTransformer
+from fluentogram.transformers.base import AbstractDataTransformer
 
 
 class MoneyTransformer(AbstractDataTransformer):
