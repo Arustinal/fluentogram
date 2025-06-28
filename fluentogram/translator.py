@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import Any
 
 from fluent_compiler.bundle import FluentBundle
+from fluent_compiler.compiler import compile_messages
+from fluent_compiler.resource import FtlResource
 
 from fluentogram.exceptions import FormatError
 
@@ -29,6 +31,13 @@ class FluentTranslator:
             return None
 
         return text
+
+    def update_translation(self, key: str, value: str) -> None:
+        """Update a translation key for a specific locale."""
+        self.translator._compiled_messages[key] = compile_messages(  # noqa: SLF001
+            self.locale,
+            [FtlResource.from_string(f"{key} = {value}")],
+        ).message_functions[key]
 
     def __repr__(self) -> str:
         return f"<fluentogram.FluentTranslator instance, {self.locale!r}>"

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
@@ -10,55 +9,71 @@ if TYPE_CHECKING:
     from fluentogram.translator import FluentTranslator
 
 
-class AbstractStorage(ABC):
+class BaseStorage:
     """Abstract storage for translators by locale."""
 
-    @abstractmethod
+    def __init__(self) -> None:
+        """Initialize storage with empty containers."""
+        self._storage: dict[str, FluentTranslator] = {}
+        self._locales_map: dict[str, Iterable[str]] = {}
+        self._translators_map: dict[str, Iterable[FluentTranslator]] = {}
+
     def add_translator(self, translator: FluentTranslator) -> None:
         """Add a translator to storage."""
-        raise NotImplementedError
+        self._storage[translator.locale] = translator
 
-    @abstractmethod
     def add_translators(self, translators: Iterable[FluentTranslator]) -> None:
         """Add multiple translators to storage."""
-        raise NotImplementedError
+        for translator in translators:
+            self.add_translator(translator)
 
-    @abstractmethod
     def get_translator(self, locale: str) -> FluentTranslator | None:
         """Get translator by locale."""
-        raise NotImplementedError
+        return self._storage.get(locale)
 
-    @abstractmethod
     def has_translator(self, locale: str) -> bool:
         """Check if translator exists for given locale."""
-        raise NotImplementedError
+        return locale in self._storage
 
-    @abstractmethod
     def get_all_translators(self) -> Iterable[FluentTranslator]:
         """Get all translators from storage."""
-        raise NotImplementedError
+        return self._storage.values()
 
-    @abstractmethod
     def get_translators_by_locales(self, locales: Iterable[str]) -> Iterable[FluentTranslator]:
         """Get translators by list of locales."""
-        raise NotImplementedError
+        return tuple(self._storage[locale] for locale in locales if locale in self._storage)
 
-    @abstractmethod
     def get_translators_list(self) -> list[FluentTranslator]:
         """Get all translators as a list."""
-        raise NotImplementedError
+        return list(self._storage.values())
 
-    @abstractmethod
     def set_locales_map(self, locales_map: dict[str, str | Iterable[str]]) -> None:
         """Set the locales mapping configuration."""
-        raise NotImplementedError
+        # Normalize locales map (convert single strings to tuples)
+        self._locales_map = {key: (value,) if isinstance(value, str) else value for key, value in locales_map.items()}
+        # Rebuild translators map
+        self._build_translators_map()
 
-    @abstractmethod
     def get_translators_map(self) -> dict[str, Iterable[FluentTranslator]]:
         """Get the translators map based on locales configuration."""
-        raise NotImplementedError
+        return self._translators_map
 
-    @abstractmethod
     def get_translators_for_language(self, language: str) -> Iterable[FluentTranslator]:
         """Get translators for a specific language based on locales map."""
-        raise NotImplementedError
+        return self._translators_map.get(language, ())
+
+    def _build_translators_map(self) -> None:
+        """Build the translators map based on locales configuration."""
+        self._translators_map = {
+            lang: self.get_translators_by_locales(translator_locales)
+            for lang, translator_locales in self._locales_map.items()
+        }
+
+    def update_translation(self, locale: str, key: str, value: str) -> bool:
+        """Update a translation key for a specific locale."""
+        translator = self._storage.get(locale)
+        if translator is None:
+            return False
+
+        translator.update_translation(key, value)
+        return True

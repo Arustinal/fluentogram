@@ -4,7 +4,7 @@ from collections.abc import Iterable
 
 from fluentogram.exceptions import RootTranslatorNotFoundError
 from fluentogram.runner import TranslatorRunner
-from fluentogram.storage.memory import MemoryStorage
+from fluentogram.storage.base import BaseStorage
 from fluentogram.translator import FluentTranslator
 
 
@@ -17,12 +17,12 @@ class TranslatorHub:
         translators: list[FluentTranslator],
         root_locale: str = "en",
         separator: str = "-",
-        storage: MemoryStorage | None = None,
+        storage: BaseStorage | None = None,
     ) -> None:
         self.root_locale = root_locale
         self.separator = separator
 
-        self.storage = storage or MemoryStorage()
+        self.storage = storage or BaseStorage()
 
         # Add translators to storage
         self.storage.add_translators(translators)
