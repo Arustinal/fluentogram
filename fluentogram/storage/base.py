@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import Iterable
 from typing import TYPE_CHECKING
 
@@ -9,7 +10,7 @@ if TYPE_CHECKING:
     from fluentogram.translator import FluentTranslator
 
 
-class BaseStorage:
+class BaseStorage(ABC):
     """Abstract storage for translators by locale."""
 
     def __init__(self) -> None:
@@ -69,7 +70,7 @@ class BaseStorage:
             for lang, translator_locales in self._locales_map.items()
         }
 
-    def update_translation(self, locale: str, key: str, value: str) -> bool:
+    async def update_translation(self, locale: str, key: str, value: str) -> bool:
         """Update a translation key for a specific locale."""
         translator = self._storage.get(locale)
         if translator is None:
@@ -77,3 +78,7 @@ class BaseStorage:
 
         translator.update_translation(key, value)
         return True
+
+    @abstractmethod
+    async def close(self) -> None:
+        pass

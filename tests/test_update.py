@@ -1,9 +1,12 @@
+import pytest
+
 from fluent_compiler.bundle import FluentBundle
 
 from fluentogram import FluentTranslator, TranslatorHub
 
 
-def test_update_translation() -> None:
+@pytest.mark.asyncio
+async def test_update_translation() -> None:
     translator_hub = TranslatorHub(
         {
             "en": "en",
@@ -18,11 +21,12 @@ def test_update_translation() -> None:
     translator = translator_hub.get_translator_by_locale("en")
     assert translator.get("start-hello") == "Hello"
 
-    translator_hub.storage.update_translation("en", "start-hello1", "Hello123")
+    await translator_hub.storage.update_translation("en", "start-hello1", "Hello123")
     assert translator.get("start-hello1") == "Hello123"
 
 
-def test_update_translation_after_fallback() -> None:
+@pytest.mark.asyncio
+async def test_update_translation_after_fallback() -> None:
     translator_hub = TranslatorHub(
         {
             "en": "en",
@@ -42,5 +46,5 @@ def test_update_translation_after_fallback() -> None:
     translator = translator_hub.get_translator_by_locale("ru")
     assert translator.get("start-hello1") == "Hello1"
 
-    translator_hub.storage.update_translation("ru", "start-hello1", "Привет1")
+    await translator_hub.storage.update_translation("ru", "start-hello1", "Привет1")
     assert translator.get("start-hello1") == "Привет1"
