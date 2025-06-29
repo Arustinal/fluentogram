@@ -5,12 +5,16 @@ description = "A proper way to use an i18n mechanism with Aiogram3."
 authors = [{ name = "Aleks" }]
 requires-python = ">=3.9"
 license = "MIT"
-dependencies = [
-    "fluent-compiler~=1.1",
-]
+dependencies = ["fluent-compiler~=1.1"]
 [project.optional-dependencies]
 cli = ["watchdog>=2.3.0,<3"]
-dev = ["ruff~=0.11.2", "pytest~=8.4.1", "pre-commit~=4.2.0", "detect-secrets~=1.5.0", "pytest-asyncio~=1.0.0"]
+dev = [
+    "ruff~=0.11.2",
+    "pytest~=8.4.1",
+    "pre-commit~=4.2.0",
+    "detect-secrets~=1.5.0",
+    "pytest-asyncio~=1.0.0",
+]
 aiogram = ["aiogram~=3.20.0"]
 nats = ["nats-py~=2.10.0"]
 
@@ -18,7 +22,7 @@ nats = ["nats-py~=2.10.0"]
 Repository = "https://github.com/Arustinal/fluentogram"
 
 [project.scripts]
-i18n = "fluentogram.cli:cli"
+fluentogram = "fluentogram.cli.main:cli"
 
 [build-system]
 requires = ["setuptools>=42"]
@@ -52,7 +56,7 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
-    "tmp"
+    "tmp",
 ]
 include = ["fluentogram/**/*.py"]
 line-length = 120
@@ -60,7 +64,19 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D", "RET504", "PGH003", "FBT001", "EM101", "TRY003", "TC003", "ANN401", "ANN003", "TC001", "TC002"]
+ignore = [
+    "D",
+    "RET504",
+    "PGH003",
+    "FBT001",
+    "EM101",
+    "TRY003",
+    "TC003",
+    "ANN401",
+    "ANN003",
+    "TC001",
+    "TC002",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]

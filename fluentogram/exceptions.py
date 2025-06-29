@@ -22,3 +22,7 @@ class FormatError(FluentogramError):
         self.original_error = original_error
         self.key = key
         super().__init__(f"Error formatting key: {self.key!r}: {self.original_error!r}")
+
+
+class StubGeneratorKeyConflictError(FluentogramError):
+    pass
