@@ -1,18 +1,7 @@
 import tempfile
 from pathlib import Path
 
-import pytest
-
-from fluentogram.exceptions import StubGeneratorKeyConflictError
 from fluentogram.stub_generator.generator import generate
-
-
-def test_conflict_error() -> None:
-    with tempfile.NamedTemporaryFile(suffix=".pyi", delete=False) as tmp_file:
-        output_path = tmp_file.name
-
-    with pytest.raises(StubGeneratorKeyConflictError):
-        generate(output_path, file_path="tests/assets/broken.ftl")
 
 
 def test_correctly_generated_stub_for_simple_file() -> None:
@@ -27,6 +16,21 @@ def test_correctly_generated_stub_for_simple_file() -> None:
     assert "class TranslatorRunner:" in content
     assert "def hello(self) -> str: ..." in content
     assert "def button(self) -> str: ..." in content
+
+
+def test_generator_if_conflict() -> None:
+    with tempfile.NamedTemporaryFile(suffix=".pyi", delete=False) as tmp_file:
+        output_path = tmp_file.name
+
+    generate(output_path, file_path="tests/assets/conflict.ftl")
+
+    assert Path(output_path).exists()
+    content = Path(output_path).read_text()
+
+    assert "class TranslatorRunner:" in content
+    assert "class Button" in content
+    assert "def __call__(self) -> str: ..." in content
+    assert "def text(self) -> str: ..." in content
 
 
 def test_correctly_generated_stub() -> None:
