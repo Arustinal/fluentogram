@@ -1,7 +1,7 @@
 [project]
 name = "fluentogram"
-version = "1.1.13"
-description = "A proper way to use an i18n mechanism with Aiogram3."
+version = "1.2.0"
+description = "Fluentogram is easy way to use i18n (Fluent) mechanism in any python app."
 authors = [{ name = "Aleks" }]
 requires-python = ">=3.9"
 license = "MIT"
