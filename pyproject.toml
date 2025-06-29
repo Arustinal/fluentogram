@@ -82,7 +82,7 @@ ignore = [
 "tests/**/*.py" = ["S101"]
 
 [tool.ruff.lint.mccabe]
-max-complexity = 5
+max-complexity = 8
 
 [tool.ruff.format]
 quote-style = "double"

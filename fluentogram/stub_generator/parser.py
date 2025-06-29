@@ -8,7 +8,7 @@ class FluentVisitor(Visitor):
     def __init__(self) -> None:
         self.messages: dict[str, set[str]] = {}
 
-    def _get_placeholders(self, element: ast.BaseNode) -> Generator[str, None, None]:  # noqa: C901
+    def _get_placeholders(self, element: ast.BaseNode) -> Generator[str, None, None]:
         if isinstance(element, ast.VariableReference):
             yield element.id.name
         elif isinstance(element, ast.Placeable):
