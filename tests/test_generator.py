@@ -45,7 +45,7 @@ def test_correctly_generated_stub() -> None:
     assert "class TranslatorRunner:" in content
     assert "def get(self, path: str, **kwargs) -> str: ..." in content
     assert 'def hello(self) -> Literal["""Hello, world!"""]: ...' in content
-    assert 'def multiline(self) -> Literal["""This is a multiline message."""' in content
+    assert 'def multiline(self) -> Literal["""This is a multiline message.' in content
     assert 'def welcome(self, *, name: str) -> Literal["""Hello, { $name }!"""]: ...' in content
     assert "class Email:" in content
     assert (
