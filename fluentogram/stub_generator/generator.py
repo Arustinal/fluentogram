@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fluentogram.stub_generator.parser import get_messages
+from fluentogram.stub_generator.parser import Message, get_messages
 
 
 class Generator:
@@ -25,7 +25,7 @@ class Generator:
         if directory:
             self.files.update(Path(directory).glob("*.ftl"))
 
-        self.messages = {}
+        self.messages: dict[str, Message] = {}
 
     def _generate_class_name(self, name: str) -> str:
         """Generate class name from message name."""
@@ -34,17 +34,27 @@ class Generator:
             return parts[0].title()
         return name.title()
 
-    def _generate_method_signature(self, name: str, params: set[str]) -> str:
-        """Generate method signature for a message."""
-        if not params:
-            return f"    def {name}(self) -> str: ..."
+    def _generate_func_signature(self, message: Message, is_method: bool = False, is_call: bool = False) -> str:  # noqa: FBT002
+        """Generate function signature for a message."""
 
-        param_list = ", ".join(f"{param}: str" for param in sorted(params))
-        return f"    def {name}(self, {param_list}) -> str: ..."
+        if is_call:
+            name = "__call__"
+        elif is_method:
+            name = message.name.split("-")[1]
+        else:
+            name = message.name
+
+        formatted_text = f'"""{message.result_text}"""'
+
+        if not message.placeholders:
+            return f"    def {name}(self) -> Literal[{formatted_text}]: ..."
+
+        param_list = ", ".join(f"{param}: str" for param in sorted(message.placeholders))
+        return f"    def {name}(self, *, {param_list}) -> Literal[{formatted_text}]: ..."
 
     def _group_messages(
         self,
-    ) -> tuple[dict[str, dict[str, set[str]]], dict[str, set[str]], dict[str, dict[str, set[str]]]]:
+    ) -> tuple[dict[str, dict[str, Message]], dict[str, Message], dict[str, dict[str, Message]]]:
         grouped_messages = {}
         simple_messages = {}
         conflict_classes = {}
@@ -82,11 +92,12 @@ class Generator:
         grouped_messages, simple_messages, conflict_classes = self._group_messages()
 
         # Generate TranslatorRunner class
-        content.append("class TranslatorRunner:\n    def get(self, path: str, **kwargs) -> str: ...")
+        content.append(
+            "from typing import Literal\n\nclass TranslatorRunner:\n    def get(self, path: str, **kwargs) -> str: ...",
+        )
 
         # Add simple messages as methods
-        for name, params in simple_messages.items():
-            content.append(self._generate_method_signature(name, params))
+        content.extend(self._generate_func_signature(message) for message in simple_messages.values())
 
         # Add grouped messages as attributes
         for base_name in grouped_messages:
@@ -103,9 +114,8 @@ class Generator:
             class_name = self._generate_class_name(base_name)
             content.append(f"class {class_name}:")
 
-            for name, params in messages_dict.items():
-                method_name = name.split("-")[1]  # Get part after dash
-                content.append(self._generate_method_signature(method_name, params))
+            for message in messages_dict.values():
+                content.append(self._generate_func_signature(message, is_method=True))
                 content.append("")
 
         # Generate classes for conflict messages
@@ -115,19 +125,22 @@ class Generator:
 
             # Add __call__ for simple key
             if base_name in messages_dict:
-                content.append("    def __call__(self) -> str: ...")
+                content.append(self._generate_func_signature(messages_dict[base_name], is_call=True))
 
             # Add methods for compound keys
-            for name, params in messages_dict.items():
+            for name, message in messages_dict.items():
                 if name != base_name:  # Skip simple key, it's already handled as __call__
-                    method_name = name.split("-")[1]  # Get part after dash
-                    content.append(self._generate_method_signature(method_name, params))
+                    content.append(self._generate_func_signature(message, is_method=True))
             content.append("")
 
         # Write to file
         self.output_file.write_text("\n".join(content))
 
 
-def generate(output_file: str, file_path: str | None = None, directory: str | None = None) -> None:
+def generate(
+    output_file: str,
+    file_path: str | None = None,
+    directory: str | None = None,
+) -> None:
     generator = Generator(output_file, file_path, directory)
     generator.generate()

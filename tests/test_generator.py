@@ -14,8 +14,8 @@ def test_correctly_generated_stub_for_simple_file() -> None:
     content = Path(output_path).read_text()
 
     assert "class TranslatorRunner:" in content
-    assert "def hello(self) -> str: ..." in content
-    assert "def button(self) -> str: ..." in content
+    assert 'def hello(self) -> Literal["""Hello, world!"""]: ...' in content
+    assert 'def button(self) -> Literal["""Button"""]: ...' in content
 
 
 def test_generator_if_conflict() -> None:
@@ -29,8 +29,8 @@ def test_generator_if_conflict() -> None:
 
     assert "class TranslatorRunner:" in content
     assert "class Button" in content
-    assert "def __call__(self) -> str: ..." in content
-    assert "def text(self) -> str: ..." in content
+    assert 'def __call__(self) -> Literal["""Button"""]: ...' in content
+    assert 'def text(self) -> Literal["""Button text"""]: ...' in content
 
 
 def test_correctly_generated_stub() -> None:
@@ -44,26 +44,30 @@ def test_correctly_generated_stub() -> None:
 
     assert "class TranslatorRunner:" in content
     assert "def get(self, path: str, **kwargs) -> str: ..." in content
-    assert "def hello(self) -> str: ..." in content
-    assert "def button(self) -> str: ..." in content
-    assert "def multiline(self) -> str: ..." in content
-    assert "def welcome(self, name: str) -> str: ..." in content
-    assert "def button(self) -> str: ..." in content
-    assert "def multiline(self) -> str: ..." in content
-    assert "def score(self, points: str) -> str: ..." in content
-    assert "def escaped(self, notAVar: str) -> str: ..." in content
-    assert "def about(self) -> str: ..." in content
+    assert 'def hello(self) -> Literal["""Hello, world!"""]: ...' in content
+    assert 'def multiline(self) -> Literal["""This is a multiline message."""' in content
+    assert 'def welcome(self, *, name: str) -> Literal["""Hello, { $name }!"""]: ...' in content
     assert "class Email:" in content
-    assert "def status(self, unreadCount: str) -> str: ..." in content
+    assert (
+        'def status(self, *, unreadCount: str) -> Literal["""You have { $unreadCount } new emails."""]: ...' in content
+    )
+    assert 'def greeting(self) -> Literal["""Hello, world! This is a phrase with another message."""]: ...' in content
     assert "class Task:" in content
-    assert "def state(self, state: str) -> str: ..." in content
+    assert 'def state(self) -> Literal["""Unknown state"""]: ...' in content
     assert "class Formatted:" in content
-    assert "def date(self, date: str) -> str: ..." in content
+    assert 'def date(self, *, date: str) -> Literal["""Today: { $date }"""]: ...' in content
+    assert 'def score(self, *, points: str) -> Literal["""You scored { $points } points"""]: ...' in content
     assert "class Outer:" in content
+    assert 'def message(self) -> Literal["""Attachment: This is a nested message."""]: ...' in content
     assert "class Inner:" in content
+    assert 'def message(self) -> Literal["""This is a nested message.This is a nested message."""]: ...' in content
+    assert 'def escaped(self, *, notAVar: str) -> Literal["""This is not a variable: { $notAVar }"""]: ...' in content
+    assert 'def about(self) -> Literal["""Information about Application X"""]: ...' in content
     assert "class Complex:" in content
-    assert "def multiline(self) -> str: ..." in content
-    assert "def welcome(self, name: str) -> str: ..." in content
-    assert "def button(self) -> str: ..." in content
-    assert "def multiline(self) -> str: ..." in content
-    assert "def score(self, points: str) -> str: ..." in content
+    assert (
+        '''def message(self, *, date: str, name: str, unreadCount: str) -> Literal["""Welcome, { $name }!
+Today { $date }.
+You have { $unreadCount } new emails.
+Thank you for using Application X!"""]: ...'''
+        in content
+    )

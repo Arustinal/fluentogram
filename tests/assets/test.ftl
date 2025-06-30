@@ -1,75 +1,75 @@
-# Простой перевод
-hello = Привет, мир!
+# Simple message
+hello = Hello, world!
 
-# Многострочное значение
+# Multiline value
 multiline =
-    Это многострочное сообщение.
-    Оно продолжается на нескольких строках.
+    This is a multiline message.
+    It continues on multiple lines.
 
-# Переменные
-welcome = Привет, { $name }!
+# Variables
+welcome = Hello, { $name }!
 
-# Атрибуты
+# Attributes
 button =
-    .label = Отправить
+    .label = Send
     .accesskey = O
 
-# Варианты (селекторы)
+# Selectors
 email-status =
     { $unreadCount ->
-        [0] У вас нет новых писем.
-        [one] У вас { $unreadCount } новое письмо.
-        [few] У вас { $unreadCount } новых письма.
-       *[other] У вас { $unreadCount } новых писем.
+        [0] You have no new emails.
+        [one] You have { $unreadCount } new email.
+        [few] You have { $unreadCount } new emails.
+       *[other] You have { $unreadCount } new emails.
     }
 
-# Использование другого сообщения (message reference)
-greeting = { hello } Это фраза с другим сообщением.
+# Message reference
+greeting = { hello } This is a phrase with another message.
 
-# Селектор по состоянию
+# Selector by state
 task-state =
     { $state ->
-        [new] Новая задача
-        [in-progress] В процессе
-        [done] Завершена
-       *[other] Неизвестное состояние
+        [new] New task
+        [in-progress] In progress
+        [done] Done
+       *[other] Unknown state
     }
 
-# Вызов функций (например, для форматирования даты/чисел)
-formatted-date = Сегодня: { DATETIME($date, month: "long", year: "numeric", day: "numeric") }
+# Function call (for formatting date/numbers)
+formatted-date = Today: { DATETIME($date, month: "long", year: "numeric", day: "numeric") }
 
-# Пример с NUMBER и использование параметров
-score = Вы набрали { NUMBER($points, minimumFractionDigits: 1) } очков
+# Example with NUMBER and using parameters
+score = You scored { NUMBER($points, minimumFractionDigits: 1) } points
 
-# Пример с вложенными сообщениями
-outer-message = Вложение: { inner-message }
-inner-message = Это вложенное сообщение.
+# Example with nested messages
+outer-message = Attachment: { inner-message }
+inner-message = This is a nested message.
 
-# Escaping фигурных скобок
-escaped = Это не переменная: {{ $notAVar }}
+# Escaping curly braces
+escaped = This is not a variable: {{ $notAVar }}
 
-# Использование term-ов (терминов, начинающихся с -)
--brand-name = Приложение X
-about = Информация о { -brand-name }
+# Using terms (terms, starting with -)
+-brand-name = Application X
+about = Information about { -brand-name }
 
-# Атрибут у термина
+# Term attribute
 -icon =
     .src = /images/icon.svg
-    .alt = Иконка
+    .alt = Icon
 
-# Комментарии
-# Это обычный комментарий
-## Это групповой комментарий
-### Это документирующий комментарий
+# Comments
+# This is a regular comment
+## This is a group comment
+### This is a documenting comment
 
-# Комбинация всего
+# Combination of everything
 complex-message =
-    Добро пожаловать, { $name }!
-    Сегодня { DATETIME($date, weekday: "long") }.
-    У вас { $unreadCount ->
-        [0] нет новых писем.
-        [one] одно новое письмо.
-        [few] { $unreadCount } новых письма.
-       *[other] { $unreadCount } новых писем.
+    Welcome, { $name }!
+    Today { DATETIME($date, weekday: "long") }.
+    You have { $unreadCount ->
+        [0] no new emails.
+        [one] one new email.
+        [few] { $unreadCount } new emails.
+       *[other] { $unreadCount } new emails.
     }
-    Спасибо, что используете { -brand-name }!
+    Thank you for using { -brand-name }!
