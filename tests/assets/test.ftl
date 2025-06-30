@@ -73,3 +73,5 @@ complex-message =
        *[other] { $unreadCount } new emails.
     }
     Thank you for using { -brand-name }!
+
+must-be-shielded = "Must be shielded"
