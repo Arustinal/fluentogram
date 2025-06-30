@@ -8,6 +8,7 @@ Fluentogram is easy way to use i18n (Fluent) mechanism in any python app.
 - Fallback support: Automatic fallback to root locale when translations are missing.
 - Precompiled fluent messages using <a href='https://github.com/django-ftl/fluent-compiler'>fluent_compiler</a> makes formatting messages faster.
 - Dot access to messages: `translator.hello(name='Alex')`
+- Stub generator
 
 ## Installation
 
@@ -57,6 +58,20 @@ Fluentogram supports a convenient attribute-based syntax for accessing translati
 ```python
 print(translator.welcome(username="Alice"))        # "Welcome, Alice!"
 print(translator.items.count(count=5))            # "You have 5 items"
+```
+
+### Stub generator with CLI
+
+#### Install with CLI dependencies
+
+```sh
+pip install fluentogram[cli]
+```
+
+#### Run generator
+
+```sh
+fluentogram -f tests/assets/test.ftl -o test.pyi
 ```
 
 ### Dynamic Storage with NATS KV
