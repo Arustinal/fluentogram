@@ -4,7 +4,7 @@ from pathlib import Path
 
 from fluentogram.stub_generator.parser import Message, get_messages
 from fluentogram.stub_generator.stubs import generate_stubs
-from fluentogram.stub_generator.tree import Tree
+from fluentogram.stub_generator.tree import build_tree
 
 
 class Generator:
@@ -34,7 +34,7 @@ class Generator:
             messages = get_messages(file.read_text())
             self.messages.update(messages)
 
-        tree = Tree(self.messages)
+        tree = build_tree(self.messages)
         content = generate_stubs(tree)
         self.output_file.write_text(content)
 

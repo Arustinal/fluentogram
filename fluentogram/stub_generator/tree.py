@@ -7,51 +7,58 @@ from fluentogram.stub_generator.parser import Message
 
 @dataclass
 class TreeNode:
-    path: str
-    children: dict[str, TreeNode]
+    """Translation tree node"""
+
     name: str
     value: str | None = None
     placeholders: list[str] = field(default_factory=list)
+    children: dict[str, TreeNode] = field(default_factory=dict)
 
     @property
     def is_leaf(self) -> bool:
+        """Is node a leaf (has no children)"""
         return not self.children
 
+    @property
+    def has_value(self) -> bool:
+        """Does node have value (translation)"""
+        return self.value is not None
 
-class Tree:
-    def __init__(
-        self,
-        ftl_syntax: dict[str, Message],
-        separator: str = "-",
-        safe_separator: str = "",
-    ) -> None:
-        self.safe_separator = safe_separator
-        self.ftl_syntax = ftl_syntax
-        self.separator = separator
-        self.elements: dict[tuple[str, ...], TreeNode] = {}
 
-        for path, translation in ftl_syntax.items():
-            *point_path, name = path.split(self.separator)
-            point_path.insert(0, "")
-            self._build(tuple(point_path), name, translation)
+def _build_node(key: str, message: Message, root: TreeNode, separator: str = "-") -> TreeNode:
+    parts = key.split(separator)
 
-    def path_to_str(self, path: tuple[str, ...]) -> str:
-        clean_path = (s[0].capitalize() + s[1:] for s in filter(lambda x: x, path))
-        return self.safe_separator.join(clean_path)
+    # Start with root
+    current_node = root
 
-    def _build(self, path: tuple[str, ...], name: str, value: Message | None = None) -> None:
-        own_class_def = TreeNode(
-            path=self.path_to_str((*path, name)),
-            name=name,
-            value=value.result_text if value else "",
-            children={},
-            placeholders=value.placeholders if value else [],
+    # Process all parts of the path, except the last one
+    for part in parts[:-1]:
+        # If child node does not exist, create it
+        if part not in current_node.children:
+            current_node.children[part] = TreeNode(name=part)
+        current_node = current_node.children[part]
+
+    # Last part is the node name with value
+    final_name = parts[-1]
+
+    # Create or update final node
+    if final_name not in current_node.children:
+        current_node.children[final_name] = TreeNode(
+            name=final_name,
+            value=message.result_text,
+            placeholders=message.placeholders,
         )
+    else:
+        # If node already exists, update its value
+        existing_node = current_node.children[final_name]
+        existing_node.value = message.result_text
+        existing_node.placeholders = message.placeholders
 
-        if path:
-            if path not in self.elements:
-                self._build(path[:-1], path[-1])
+    return current_node
 
-            self.elements[path].children[name] = own_class_def
 
-        self.elements.setdefault((*path, name), own_class_def)
+def build_tree(messages: dict[str, Message], separator: str = "-") -> TreeNode:
+    root = TreeNode(name="root")
+    for key, message in messages.items():
+        _build_node(key, message, root, separator)
+    return root

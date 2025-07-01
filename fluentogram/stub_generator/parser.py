@@ -144,7 +144,7 @@ class Parser:
             else:
                 logger.warning("Unknown element type in message %s: %s", message_obj.name, type(element))
 
-    def parse(self, resource: ast.Resource) -> None:
+    def parse(self, resource: ast.Resource) -> dict[str, Message]:
         # First pass: collect all terms and message structures
         for entry in resource.body:
             if isinstance(entry, ast.Term):
@@ -156,8 +156,14 @@ class Parser:
         for message_obj in self.messages.values():
             self._process_message_elements(message_obj)
 
+        return self._get_processed_messages()
+
+    def _get_processed_messages(self) -> dict[str, Message]:
+        return {
+            message.name: message for message in self.messages.values() if message.result_text or message.placeholders
+        }
+
 
 def get_messages(text: str) -> dict[str, Message]:
     parser = Parser()
-    parser.parse(FluentParser(with_spans=False).parse(text))
-    return parser.messages
+    return parser.parse(FluentParser(with_spans=False).parse(text))
