@@ -22,3 +22,10 @@ class FormatError(FluentogramError):
         self.original_error = original_error
         self.key = key
         super().__init__(f"Error formatting key: {self.key!r}: {self.original_error!r}")
+
+
+class LocalesNotFoundError(FluentogramError):
+    def __init__(self, locales: list[str], path: str) -> None:
+        self.locales = locales
+        self.path = path
+        super().__init__(f"No locales found in {self.path}")

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 from fluentogram.exceptions import RootTranslatorNotFoundError
 from fluentogram.runner import TranslatorRunner
@@ -13,8 +13,8 @@ class TranslatorHub:
 
     def __init__(
         self,
-        locales_map: dict[str, str | Iterable[str]],
-        translators: list[FluentTranslator],
+        locales_map: Mapping[str, str | Iterable[str]],
+        translators: list[FluentTranslator] | None = None,
         root_locale: str = "en",
         separator: str = "-",
         storage: BaseStorage | None = None,
@@ -25,7 +25,8 @@ class TranslatorHub:
         self.storage = storage or MemoryStorage()
 
         # Add translators to storage
-        self.storage.add_translators(translators)
+        if translators is not None:
+            self.storage.add_translators(translators)
 
         # Set locales map in storage
         self.storage.set_locales_map(locales_map)

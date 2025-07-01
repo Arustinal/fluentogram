@@ -74,6 +74,28 @@ pip install fluentogram[cli]
 fluentogram -f tests/assets/test.ftl -o test.pyi
 ```
 
+## Storages
+
+### File storage
+
+```python
+from fluentogram import TranslatorHub
+from fluentogram.storage.file import FileStorage
+
+# Create FileStorage with custom path
+storage = FileStorage("my_translations/{locale}/")
+
+locales_map = {
+    "en": "en",
+}
+
+hub = TranslatorHub(locales_map, storage=storage)
+
+translator = hub.get_translator_by_locale("en")
+
+print(translator.get("hello"))  # Hello, world!
+```
+
 ### Dynamic Storage with NATS KV
 
 Fluentogram supports real-time translation updates using NATS KV storage:

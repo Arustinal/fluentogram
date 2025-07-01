@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -48,7 +48,7 @@ class BaseStorage(ABC):
         """Get all translators as a list."""
         return list(self._storage.values())
 
-    def set_locales_map(self, locales_map: dict[str, str | Iterable[str]]) -> None:
+    def set_locales_map(self, locales_map: Mapping[str, str | Iterable[str]]) -> None:
         """Set the locales mapping configuration."""
         # Normalize locales map (convert single strings to tuples)
         self._locales_map = {key: (value,) if isinstance(value, str) else value for key, value in locales_map.items()}
