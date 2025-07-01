@@ -36,17 +36,17 @@ class Import(RenderAble):
 
 class Method(RenderAble):
     render_pattern = jinja_env.from_string(
-        '    @staticmethod\n    def {{ method_name }}({{ args }}) -> Literal["""{{ translation }}"""]: ...',
+        '    @staticmethod\n    def {{ method_name }}({{ args }}) -> Literal["""{{ result_text }}"""]: ...',
     )
 
     def __init__(
         self,
         method_name: str,
-        translation: str,
+        result_text: str,
         args: Iterable[str] | None = None,
     ) -> None:
-        formatted_args = "*, " + ", ".join(args) if args else ""
-        super().__init__(translation=translation, args=formatted_args)
+        formatted_args = "*, " + ", ".join(f"{arg}: PossibleValue" for arg in args) if args else ""
+        super().__init__(result_text=result_text, args=formatted_args)
         self.kwargs["method_name"] = method_name
 
     def render(self) -> str:
@@ -54,8 +54,8 @@ class Method(RenderAble):
 
 
 class InternalMethod(Method):
-    def __init__(self, translation: str, args: Iterable[str] | None = None) -> None:
-        super().__init__(method_name="__call__", translation=translation, args=args)
+    def __init__(self, result_text: str, args: Iterable[str] | None = None) -> None:
+        super().__init__(method_name="__call__", result_text=result_text, args=args)
 
 
 class ClassRef(RenderAble):
@@ -101,7 +101,15 @@ class Class(RenderAble):
 
 class Runner(Class):
     render_pattern = jinja_env.from_string(
-        "from typing import Literal\n\nclass {{ class_name }}:\n    def get(self, path: str, **kwargs) -> str: ...",
+        """from decimal import Decimal
+from typing import Literal
+
+from typing_extensions import TypeAlias
+
+PossibleValue: TypeAlias = str | int | float | Decimal | bool
+
+class {{ class_name }}:
+    def get(self, path: str, **kwargs: PossibleValue) -> str: ...""",
     )
 
     def __init__(self, knots: list[Class], name: str = "TranslatorRunner") -> None:

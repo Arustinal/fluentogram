@@ -18,7 +18,7 @@ def _process_node(node: TreeNode, runner: Runner, parent_path: str = "") -> Clas
     # If node has value (translation), add method __call__
     if node.value is not None:
         knot.add_method(
-            InternalMethod(node.value, args=node.placeholders),
+            InternalMethod(result_text=node.value, args=node.placeholders),
         )
 
     # Process child nodes
@@ -28,8 +28,8 @@ def _process_node(node: TreeNode, runner: Runner, parent_path: str = "") -> Clas
             if sub_node.value is not None:
                 knot.add_method(
                     Method(
-                        name,
-                        sub_node.value,
+                        method_name=name,
+                        result_text=sub_node.value,
                         args=sub_node.placeholders,
                     ),
                 )
@@ -53,8 +53,8 @@ def generate_stubs(tree: TreeNode) -> str:
             if node.value is not None:
                 runner.add_method(
                     Method(
-                        node.name,
-                        node.value,
+                        method_name=node.name,
+                        result_text=node.value,
                         args=node.placeholders,
                     ),
                 )
