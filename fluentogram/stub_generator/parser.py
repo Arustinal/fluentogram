@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from fluent.syntax import FluentParser, ast
 
@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 class Message:
     name: str
     result_text: str
-    placeholders: list[str]
     raw_elements: list[ast.TextElement | ast.Placeable]  # Store raw elements for later processing
+    placeholders: set[str] = field(default_factory=set)
 
 
 class Parser:
@@ -31,7 +31,7 @@ class Parser:
                 logger.warning("Unknown element type in term %s: %s", term.id.name, type(element))
 
     def _parse_variable_reference(self, message_obj: Message, element: ast.VariableReference) -> None:
-        message_obj.placeholders.append(element.id.name)
+        message_obj.placeholders.add(element.id.name)
         message_obj.result_text += f"{{ ${element.id.name} }}"
 
     def _parse_term_reference(self, message_obj: Message, element: ast.TermReference) -> None:
@@ -117,7 +117,6 @@ class Parser:
         message_obj = Message(
             name=message.id.name,
             result_text="",
-            placeholders=[],
             raw_elements=[],
         )
 
