@@ -63,7 +63,7 @@ def test_correctly_generated_stub() -> None:
     assert 'def about() -> Literal["""Information about Application X"""]: ...' in content
     assert "class Complex:" in content
     assert (
-        '''def message(*, name, date, unreadCount) -> Literal["""Welcome, { $name }!
+        '''def message(*, date, name, unreadCount) -> Literal["""Welcome, { $name }!
 Today { $date }.
 You have { $unreadCount } new emails.
 Thank you for using Application X!"""]: ...'''
