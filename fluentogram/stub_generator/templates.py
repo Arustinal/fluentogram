@@ -9,11 +9,11 @@ def create_jinja_env() -> Environment:
     """Create Jinja2 environment with custom filters"""
     env = Environment(autoescape=True)
 
-    def title(value: str) -> str:
-        """Convert string to title case"""
-        return value.title()
+    def camelcase(value: str) -> str:
+        """Convert dash/underscore separated string to CamelCase"""
+        return "".join(word.capitalize() for word in value.replace("_", "-").split("-"))
 
-    env.filters["title"] = title
+    env.filters["camelcase"] = camelcase
     return env
 
 
@@ -27,7 +27,7 @@ class RenderAble:
         self.kwargs = kwargs
 
     def render(self) -> str:
-        return self.render_pattern.render(**self.kwargs) + "\n"
+        return self.render_pattern.render(**self.kwargs)
 
 
 class Import(RenderAble):
@@ -49,6 +49,9 @@ class Method(RenderAble):
         super().__init__(translation=translation, args=formatted_args)
         self.kwargs["method_name"] = method_name
 
+    def render(self) -> str:
+        return super().render() + "\n"
+
 
 class InternalMethod(Method):
     def __init__(self, translation: str, args: Iterable[str] | None = None) -> None:
@@ -57,7 +60,7 @@ class InternalMethod(Method):
 
 class ClassRef(RenderAble):
     render_pattern = jinja_env.from_string(
-        "    {{ var_name }}: {{ var_full_name | title }}",
+        "    {{ var_name }}: {{ var_full_name | camelcase }}",
     )
 
     def __init__(self, var_name: str, var_full_name: str | None = None) -> None:
@@ -66,9 +69,12 @@ class ClassRef(RenderAble):
             var_full_name=var_full_name or var_name,
         )
 
+    def render(self) -> str:
+        return super().render() + "\n"
+
 
 class Class(RenderAble):
-    render_pattern = jinja_env.from_string("\nclass {{ class_name | title }}:\n")
+    render_pattern = jinja_env.from_string("\nclass {{ class_name | camelcase }}:")
 
     def __init__(self, class_name: str) -> None:
         super().__init__()
@@ -83,8 +89,8 @@ class Class(RenderAble):
         if self.class_refs:
             text += "\n"
         for method in self.methods:
-            text += method.render() + "\n"
-        return text
+            text += method.render()
+        return text.rstrip() + "\n"
 
     def add_class_ref(self, class_ref: ClassRef) -> None:
         self.class_refs.append(class_ref)
@@ -95,7 +101,7 @@ class Class(RenderAble):
 
 class Runner(Class):
     render_pattern = jinja_env.from_string(
-        "\nclass {{ class_name }}:\n    def get(self, path: str, **kwargs) -> str: ...\n    ",
+        "from typing import Literal\n\nclass {{ class_name }}:\n    def get(self, path: str, **kwargs) -> str: ...",
     )
 
     def __init__(self, knots: list[Class], name: str = "TranslatorRunner") -> None:

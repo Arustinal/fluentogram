@@ -70,3 +70,19 @@ Thank you for using Application X!"""]: ...'''
         in content
     )
     assert 'def shielded() -> Literal["""&#34;Must be shielded&#34;"""]: ...' in content
+
+
+def test_generator_if_conflict_in_prefix() -> None:
+    with tempfile.NamedTemporaryFile(suffix=".pyi", delete=False) as tmp_file:
+        output_path = tmp_file.name
+
+    generate(output_path, file_path="tests/assets/conflict_in_prefix.ftl")
+
+    assert Path(output_path).exists()
+    content = Path(output_path).read_text()
+
+    assert "class TranslatorRunner:" in content
+    assert "class FirstUnknown" in content
+    assert "class AnotherUnknown" in content
+    assert 'def error() -> Literal["""first-unknown-error"""]: ...' in content
+    assert 'def error() -> Literal["""another-unknown-error"""]: ...' in content

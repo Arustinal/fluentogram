@@ -1,4 +1,4 @@
-from fluentogram.stub_generator.renderable import (
+from fluentogram.stub_generator.templates import (
     Class,
     ClassRef,
     InternalMethod,
@@ -8,9 +8,12 @@ from fluentogram.stub_generator.renderable import (
 from fluentogram.stub_generator.tree import TreeNode
 
 
-def _process_node(node: TreeNode, runner: Runner) -> Class:
+def _process_node(node: TreeNode, runner: Runner, parent_path: str = "") -> Class:
     """Recursively processes tree node and creates corresponding class"""
-    knot = Class(node.name)
+    # Create unique class name by combining parent path with node name
+    current_path = f"{parent_path}-{node.name}" if parent_path else node.name
+
+    knot = Class(current_path)
 
     # If node has value (translation), add method __call__
     if node.value is not None:
@@ -32,7 +35,7 @@ def _process_node(node: TreeNode, runner: Runner) -> Class:
                 )
         else:
             # If child node is not leaf, create class reference
-            sub_class = _process_node(sub_node, runner)
+            sub_class = _process_node(sub_node, runner, current_path)
             runner.add_knot(sub_class)
             knot.add_class_ref(ClassRef(name, sub_class.class_name))
 
@@ -40,7 +43,7 @@ def _process_node(node: TreeNode, runner: Runner) -> Class:
 
 
 def generate_stubs(tree: TreeNode) -> str:
-    content = "from typing import Literal\n"
+    content = ""
     runner = Runner(knots=[])
 
     # Process root nodes
