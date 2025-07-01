@@ -84,6 +84,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S101"]
+"fluentogram/stub_generator/**/*.py" = ["T201"]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 8
