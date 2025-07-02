@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from fluent_compiler.bundle import FluentBundle
@@ -22,7 +22,7 @@ def test_date_transformer() -> None:
     translator = hub.get_translator_by_locale("en")
 
     # Use DateTimeTransformer for proper date formatting
-    meeting_date = datetime(2024, 1, 15, 14, 30, tzinfo=UTC)
+    meeting_date = datetime(2024, 1, 15, 14, 30, tzinfo=timezone.utc)
     formatted_date = DateTimeTransformer(meeting_date, dateStyle="full", timeStyle="short")
     assert (
         translator.get(
