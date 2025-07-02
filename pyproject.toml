@@ -12,7 +12,8 @@ license = "MIT"
 dependencies = ["fluent-compiler~=1.1"]
 
 [project.optional-dependencies]
-cli = ["jinja2>=3.1.0,<4"]
+stubs = ["jinja2>=3.1.0,<4"]
+cli = ["fluentogram[stubs]"]
 aiogram = ["aiogram~=3.20.0"]
 nats = ["nats-py~=2.10.0"]
 
