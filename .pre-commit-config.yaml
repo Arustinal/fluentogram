@@ -1,0 +1,28 @@
+default_stages: [pre-commit, pre-merge-commit]
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: no-commit-to-branch
+        args: [ '--branch', 'master' ]
+      - id: end-of-file-fixer
+        files: ^fluentogram/
+      - id: trailing-whitespace
+        files: ^fluentogram/
+
+  - repo: local
+    hooks:
+      - id: lint
+        name: Linter
+        entry: "scripts/lint-pre-commit.sh"
+        language: python
+        types: [python]
+        require_serial: true
+        verbose: true
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        stages: [pre-commit, pre-merge-commit, manual]

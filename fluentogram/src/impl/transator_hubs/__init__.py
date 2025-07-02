@@ -1,2 +1,3 @@
-from .kv_translator_hub import KvTranslatorHub
-from .translator_hub import TranslatorHub
+from fluentogram import KvTranslatorHub
+
+__all__ = ["KvTranslatorHub"]

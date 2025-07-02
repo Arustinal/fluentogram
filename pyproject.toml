@@ -1,24 +1,96 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "fluentogram"
-version = "1.1.13"
-description = "A proper way to use an i18n mechanism with Aiogram3."
+version = "1.2.0"
+description = "Fluentogram is easy way to use i18n (Fluent) mechanism in any python app."
 authors = [{ name = "Aleks" }]
-requires-python = "~=3.9"
+requires-python = ">=3.9"
 license = "MIT"
-dependencies = [
-    "fluent-compiler~=1.1",
-    "watchdog>=2.3.0,<3",
-    "ordered-set>=4.1.0,<5",
-    "nats-py>=2.9.0,<3",
-    "typing-extensions>=4.12.2,<5",
+dependencies = ["fluent-compiler~=1.1"]
+
+[project.optional-dependencies]
+stubs = ["jinja2>=3.1.0,<4"]
+cli = ["fluentogram[stubs]", "watchdog>=3.0.0"]
+aiogram = ["aiogram~=3.20.0"]
+nats = ["nats-py~=2.10.0"]
+
+dev = [
+    "fluentogram[cli,aiogram,nats]",
+    "ruff~=0.11.2",
+    "pytest~=8.4.1",
+    "pre-commit~=4.2.0",
+    "detect-secrets~=1.5.0",
+    "pytest-asyncio~=1.0.0",
 ]
+
 
 [project.urls]
 Repository = "https://github.com/Arustinal/fluentogram"
 
 [project.scripts]
-i18n = "fluentogram.cli:cli"
+fluentogram = "fluentogram.cli.main:cli"
 
-[build-system]
-requires = ["setuptools>=42"]
-build-backend = "setuptools.build_meta"
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "tmp",
+]
+include = ["fluentogram/**/*.py"]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",
+    "RET504",
+    "PGH003",
+    "FBT001",
+    "EM101",
+    "TRY003",
+    "TC003",
+    "ANN401",
+    "ANN003",
+    "TC001",
+    "TC002",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+"fluentogram/stub_generator/**/*.py" = ["T201"]
+"fluentogram/cli/**/*.py" = ["T201"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
