@@ -1,6 +1,6 @@
 # fluentogram
 
-Fluentogram is easy way to use i18n (<a href='https://projectfluent.org/'>Fluent</a>) mechanism in any python app.
+fluentogram is easy way to use i18n (<a href='https://projectfluent.org/'>Fluent</a>) mechanism in any python app.
 
 ## Features
 
@@ -96,13 +96,13 @@ translator = hub.get_translator_by_locale("en")
 print(translator.get("hello"))  # Hello, world!
 ```
 
-## Fluentogram supports real-time translation updates using NATS KV storage:
+## fluentogram supports real-time translation updates using NATS KV storage:
 
 Install:
+
 ```sh
 pip install fluentogram[nats]
 ```
-
 
 ```python
 import asyncio
@@ -180,3 +180,63 @@ except RootTranslatorNotFoundError as e:
 except FormatError as e:
     print(f"Formatting error for key {e.key}: {e.original_error}")
 ```
+
+# Inside of fluentogram
+
+### TranslatorHub
+
+`TranslatorHub` is unit of distribution TranslatorRunner's.
+
+Init:
+
+```python
+def __init__(
+    self,
+    locales_map: dict[str, str | Iterable[str]],
+    translators: list[FluentTranslator],
+    root_locale: str = "en",
+) -> None:
+```
+
+### Locales map 
+
+That's like a configuration map for "Rollback" feature. If you haven't configured translation for current locale - first in collection, "Rollback" will look to others locales' data and try to find a translation
+
+For example:
+
+```python
+locales_map = {
+    "ua": ("ua", "de", "en"),
+    "de": ("de", "en"),
+    "en": ("en",)
+}
+```
+
+Let's look at this example
+
+If translator does not find a translation for `ua` locale in `ua` data, next stop is `de` data. If it's failed too - it will look to `en` translations.
+
+### Translators
+
+You have 3 variants to use translators:
+
+- In memory
+
+```python
+translators = [
+    FluentTranslator(
+        "en",
+        translator=FluentBundle.from_string(
+            "en-US",
+            "welcome = Welcome, { $username }!\n"
+            "items-count = You have { $count } items",
+        ),
+    ),
+]
+hub = TranslatorHub(locales_map, translators)
+```
+
+- From files using file storage
+- From NATS KV using storage
+
+[↑ Back to Storages](#storages)
