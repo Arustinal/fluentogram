@@ -8,7 +8,6 @@ from contextlib import suppress
 from typing import Any, Callable
 
 from nats import connect
-from nats.aio.client import Client
 from nats.aio.msg import Msg
 from nats.js import JetStreamContext
 from nats.js.api import KeyValueConfig
@@ -25,15 +24,15 @@ logger = logging.getLogger(__name__)
 class NatsKvStorage(BaseStorage):
     def __init__(  # noqa: PLR0913
         self,
-        nc: Client,
         kv: KeyValue,
+        js: JetStreamContext,
         separator: str = ".",
         serializer: _JsonDumps = lambda data: json.dumps(data).encode("utf-8"),
         deserializer: _JsonLoads = json.loads,
         consume_timeout: float = 1.0,
     ) -> None:
-        self._nc = nc
-        self._js = nc.jetstream()
+        self._js = js
+        self._nc = js._nc  # noqa: SLF001
         self._kv = kv
         self._stream_name = kv._stream  # noqa: SLF001
         self.separator = separator
@@ -57,7 +56,7 @@ class NatsKvStorage(BaseStorage):
         nc = await connect(servers=servers)
         js = nc.jetstream()
         kv = await js.create_key_value(config=kv_config)
-        return cls(nc, kv, separator, serializer, deserializer)
+        return cls(kv, js, separator, serializer, deserializer)
 
     async def update_translation(
         self,
@@ -81,6 +80,8 @@ class NatsKvStorage(BaseStorage):
         """Process messages from the consumer."""
         try:
             messages: list[Msg] = await consumer.fetch(50, timeout=self.consume_timeout)
+            if not messages:
+                return
             logger.debug("Received %d messages: %s", len(messages), messages)
             await self._update_compiled_messages(messages)
         except TimeoutError:
@@ -131,3 +132,6 @@ class NatsKvStorage(BaseStorage):
                 await self._listen_for_changes_task
 
         await self._nc.close()
+
+
+NatsStorage = NatsKvStorage  # backward compatibility

@@ -34,6 +34,10 @@ class TranslatorHub:
         if not self.storage.has_translator(root_locale):
             raise RootTranslatorNotFoundError(self.root_locale)
 
+    async def update_translation(self, locale: str, key: str, value: str) -> bool:
+        """Update translation for a given locale and key."""
+        return await self.storage.update_translation(locale, key, value)
+
     def get_translator_by_locale(self, locale: str) -> TranslatorRunner:
         """Here is a little tricky moment.
         There should be like a one-shot scheme.

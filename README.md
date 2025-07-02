@@ -1,6 +1,6 @@
-# Fluentogram
+# fluentogram
 
-Fluentogram is easy way to use i18n (Fluent) mechanism in any python app.
+Fluentogram is easy way to use i18n (<a href='https://projectfluent.org/'>Fluent</a>) mechanism in any python app.
 
 ## Features
 
@@ -96,9 +96,13 @@ translator = hub.get_translator_by_locale("en")
 print(translator.get("hello"))  # Hello, world!
 ```
 
-### Dynamic Storage with NATS KV
+## Fluentogram supports real-time translation updates using NATS KV storage:
 
-Fluentogram supports real-time translation updates using NATS KV storage:
+Install:
+```sh
+pip install fluentogram[nats]
+```
+
 
 ```python
 import asyncio

@@ -19,6 +19,10 @@ class BaseStorage(ABC):
         self._locales_map: dict[str, Iterable[str]] = {}
         self._translators_map: dict[str, Iterable[FluentTranslator]] = {}
 
+    def get_locales_map(self) -> dict[str, Iterable[str]]:
+        """Get the locales mapping configuration."""
+        return self._locales_map
+
     def add_translator(self, translator: FluentTranslator) -> None:
         """Add a translator to storage."""
         self._storage[translator.locale] = translator
