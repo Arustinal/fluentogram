@@ -13,7 +13,7 @@ class Message:
     name: str
     result_text: str
     raw_elements: list[ast.TextElement | ast.Placeable]  # Store raw elements for later processing
-    placeholders: set[str] = field(default_factory=set)
+    placeholders: list[str] = field(default_factory=list)
 
 
 class Parser:
@@ -31,7 +31,8 @@ class Parser:
                 logger.warning("Unknown element type in term %s: %s", term.id.name, type(element))
 
     def _parse_variable_reference(self, message_obj: Message, element: ast.VariableReference) -> None:
-        message_obj.placeholders.add(element.id.name)
+        if element.id.name not in message_obj.placeholders:
+            message_obj.placeholders.append(element.id.name)
         message_obj.result_text += f"{{ ${element.id.name} }}"
 
     def _parse_term_reference(self, message_obj: Message, element: ast.TermReference) -> None:
@@ -45,7 +46,10 @@ class Parser:
                 # If the referenced message hasn't been processed yet, process it now
                 self._process_message_elements(referenced_message)
             message_obj.result_text += referenced_message.result_text
-            message_obj.placeholders.update(referenced_message.placeholders)
+            # Add placeholders from referenced message, preserving order and avoiding duplicates
+            for placeholder in referenced_message.placeholders:
+                if placeholder not in message_obj.placeholders:
+                    message_obj.placeholders.append(placeholder)
         else:
             logger.warning("Message reference %s not found", element.id.name)
 
@@ -130,6 +134,9 @@ class Parser:
         message_obj.raw_elements = message.value.elements
         self.messages[message.id.name] = message_obj
 
+    def _sort_placeholders(self, message_obj: Message) -> None:
+        message_obj.placeholders = sorted(message_obj.placeholders)
+
     def _process_message_elements(self, message_obj: Message) -> None:
         """Process the raw elements of a message to generate result_text and placeholders."""
         # Skip if already processed
@@ -143,6 +150,8 @@ class Parser:
                 self._parse_placeable(message_obj, element)
             else:
                 logger.warning("Unknown element type in message %s: %s", message_obj.name, type(element))
+
+        self._sort_placeholders(message_obj)
 
     def parse(self, resource: ast.Resource) -> dict[str, Message]:
         # First pass: collect all terms and message structures
