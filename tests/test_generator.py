@@ -91,3 +91,14 @@ def test_generator_if_conflict_in_prefix() -> None:
     assert "class AnotherUnknown" in content
     assert 'def error() -> Literal["""first-unknown-error"""]: ...' in content
     assert 'def error() -> Literal["""another-unknown-error"""]: ...' in content
+
+
+def test_generator_if_reference_with_args() -> None:
+    with tempfile.NamedTemporaryFile(suffix=".pyi", delete=False) as tmp_file:
+        output_path = tmp_file.name
+
+    generate(output_path, file_path="tests/assets/reference_with_args.ftl")
+
+    assert Path(output_path).exists()
+    content = Path(output_path).read_text()
+    assert "def message(*, first_arg: PossibleValue, second_arg: PossibleValue, third_arg: PossibleValue)" in content

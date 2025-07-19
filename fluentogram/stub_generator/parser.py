@@ -46,6 +46,7 @@ class Parser:
                 # If the referenced message hasn't been processed yet, process it now
                 self._process_message_elements(referenced_message)
             message_obj.result_text += referenced_message.result_text
+            message_obj.placeholders.extend(referenced_message.placeholders)
         else:
             logger.warning("Message reference %s not found", element.id.name)
 
