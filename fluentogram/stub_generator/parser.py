@@ -46,6 +46,10 @@ class Parser:
                 # If the referenced message hasn't been processed yet, process it now
                 self._process_message_elements(referenced_message)
             message_obj.result_text += referenced_message.result_text
+            # Add placeholders from referenced message, preserving order and avoiding duplicates
+            for placeholder in referenced_message.placeholders:
+                if placeholder not in message_obj.placeholders:
+                    message_obj.placeholders.append(placeholder)
         else:
             logger.warning("Message reference %s not found", element.id.name)
 

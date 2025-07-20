@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fluentogram"
-version = "1.2.0"
+version = "1.2.1"
 description = "Fluentogram is easy way to use i18n (Fluent) mechanism in any python app."
 authors = [{ name = "Aleks" }]
 requires-python = ">=3.9"
